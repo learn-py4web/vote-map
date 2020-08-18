@@ -18,12 +18,32 @@ function initMap() {
     info_window = new google.maps.InfoWindow();
     geolocate(info_window, map);
 
-    addYourLocationButton(map);
+    add_location_button(map);
+
+    add_markers(map);
 }
 
 
-function addYourLocationButton(map)
-{
+function add_markers(map) {
+    let lat = 37.462910;
+    let lng = -121.997299;
+    let latlng = new google.maps.LatLng(lat, lng);
+    var marker = new google.maps.Marker({
+        position: latlng,
+        title: "Great Blue Heron"
+    });
+    const infowindow = new google.maps.InfoWindow({
+        content: '<h1 class="is-size-5 has-text-weight-semibold">Great Blue Heron</h1>'
+    });
+    marker.addListener("click", () => {
+        infowindow.open(map, marker);
+    })
+    marker.setMap(map);
+}
+
+
+
+function add_location_button(map) {
     var controlDiv = document.createElement('div');
 
     var location_button = document.createElement('button');
