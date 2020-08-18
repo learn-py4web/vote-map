@@ -1,19 +1,22 @@
 
 // Map and its initialization.
+
+var infoWindow;
+var map;
+
 function initMap() {
-    var map = new google.maps.Map(
+    map = new google.maps.Map(
         document.getElementById('map'), {
           center: {lat: 37, lng: -120},
           zoom: 6
         });
-    var infoWindow = new google.maps.InfoWindow();
+    infoWindow = new google.maps.InfoWindow();
     geolocate(infoWindow, map);
 }
 
 function geolocate(infoWindow, map) {
 // Try HTML5 geolocation.
     if (navigator.geolocation) {
-        console.log("Getting location");
         navigator.geolocation.getCurrentPosition(function (position) {
             console.log("Gotten position:", position.coords)
             var pos = {
@@ -23,27 +26,19 @@ function geolocate(infoWindow, map) {
 
             infoWindow.setPosition(pos);
             infoWindow.setContent('Location found.');
-            console.log("Found position:", pos)
             infoWindow.open(map);
             map.setCenter(pos);
         }, function () {
-            console.log("some error");
             handleLocationError(true, infoWindow, map.getCenter());
         },
             {timeout: 2000});
     } else {
-        // Browser doesn't support Geolocation
-        console.log("nope");
-        handleLocationError(false, infoWindow, map.getCenter());
+        console.log("Location could not be determined.");
     }
 }
 
 function handleLocationError(browserHasGeolocation, infoWindow, pos) {
-    infoWindow.setPosition(pos);
-    infoWindow.setContent(browserHasGeolocation ?
-        'Error: The Geolocation service failed.' :
-        'Error: Your browser doesn\'t support geolocation.');
-    infoWindow.open(map);
+    console.log("Location could not be determined.");
 }
 
 
