@@ -12,13 +12,20 @@ See https://developers.google.com/maps/documentation/urls/get-started
 
   <div id="vue-target">
 
-    <h1 class="title">Places</h1>
-    <ul>
-      <li v-for="p in places"><a @click="goto(p._idx)">{{p.name}}</a></li>
-    </ul>
+    <div class="columns">
+      <div class="column is-narrow">
+        <h1 class="title">Places</h1>
+        <ul>
+          <li v-for="p in places"><a @click="goto(p._idx)">{{p.name}}</a></li>
+        </ul>
+      </div>
 
-    <iframe width="600" style="height:450px !important" height="450" frameborder="0" style="border:0"
-            :src="mapsurl" allowfullscreen></iframe>
+      <div class="column">
+        <iframe width="100%" style="height:450px !important" height="450" frameborder="0" style="border:0"
+                :src="mapsurl" allowfullscreen></iframe>
+      </div>
+
+    </div>
 
   </div>
 
