@@ -1,7 +1,7 @@
 
 // Map and its initialization.
 
-var infoWindow;
+var info_window;
 var map;
 var location_timeout = 4000;
 
@@ -15,8 +15,8 @@ function initMap() {
                 position: google.maps.ControlPosition.BOTTOM_LEFT,
             }
         });
-    infoWindow = new google.maps.InfoWindow();
-    geolocate(infoWindow, map);
+    info_window = new google.maps.InfoWindow();
+    geolocate(info_window, map);
 
     addYourLocationButton(map);
 }
@@ -26,23 +26,23 @@ function addYourLocationButton(map)
 {
     var controlDiv = document.createElement('div');
 
-    var firstChild = document.createElement('button');
-    firstChild.style.backgroundColor = '#fff';
-    firstChild.style.border = 'none';
-    firstChild.style.outline = 'none';
-    firstChild.style.borderRadius = '2px';
-    firstChild.style.boxShadow = '0 1px 4px rgba(0,0,0,0.3)';
-    firstChild.style.cursor = 'pointer';
-    firstChild.style.marginRight = '10px';
-    firstChild.style.padding = '10px';
-    firstChild.title = 'Your Location';
-    controlDiv.appendChild(firstChild);
+    var location_button = document.createElement('button');
+    location_button.style.backgroundColor = '#fff';
+    location_button.style.border = 'none';
+    location_button.style.outline = 'none';
+    location_button.style.borderRadius = '2px';
+    location_button.style.boxShadow = '0 1px 4px rgba(0,0,0,0.3)';
+    location_button.style.cursor = 'pointer';
+    location_button.style.marginRight = '10px';
+    location_button.style.padding = '10px';
+    location_button.title = 'Your Location';
+    controlDiv.appendChild(location_button);
 
-    var secondChild = document.createElement('i');
-    secondChild.classList.add('fa', 'fa-2x', 'fa-crosshairs');
-    firstChild.appendChild(secondChild);
+    var location_icon = document.createElement('i');
+    location_icon.classList.add('fa', 'fa-2x', 'fa-crosshairs');
+    location_button.appendChild(location_icon);
 
-    firstChild.addEventListener('click', function() {
+    location_button.addEventListener('click', function() {
         if(navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(function(position) {
                 var latlng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
@@ -63,7 +63,7 @@ function addYourLocationButton(map)
     map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(controlDiv);
 }
 
-function geolocate(infoWindow, map) {
+function geolocate(info_window, map) {
 // Try HTML5 geolocation.
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function (position) {
@@ -73,12 +73,12 @@ function geolocate(infoWindow, map) {
                 lng: position.coords.longitude
             };
 
-            infoWindow.setPosition(pos);
-            infoWindow.setContent('Location found.');
-            infoWindow.open(map);
+            info_window.setPosition(pos);
+            info_window.setContent('Location found.');
+            info_window.open(map);
             map.setCenter(pos);
         }, function () {
-            handleLocationError(true, infoWindow, map.getCenter());
+            handleLocationError(true, info_window, map.getCenter());
         },
             {timeout: location_timeout});
     } else {
