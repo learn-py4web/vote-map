@@ -43,9 +43,11 @@ let init = (app) => {
             if (p.lat !== undefined) {
                 p.url = "https://www.google.com/maps/embed/v1/place?key=" + maps_api_key
                     + "&q=" + p.lat + "," + p.lng;
+                p.exturl = "https://www.google.com/maps/search/?api=1&query=" + p.lat + "," + p.lng;
             } else if (p.loc !== undefined) {
-                p.url = "https://www.google.com/maps/embed/v1/place?key=" + maps_api_key
-                    + "&q=" + encodeURIComponent(p.loc);
+                eq = encodeURIComponent(p.loc);
+                p.url = "https://www.google.com/maps/embed/v1/place?key=" + maps_api_key + "&q=" + eq;
+                p.exturl = "https://www.google.com/maps/search/?api=1&query=" + eq;
             }
         }
         app.vue.places = places;

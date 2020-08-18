@@ -16,7 +16,8 @@ See https://developers.google.com/maps/documentation/urls/get-started
       <div class="column is-narrow">
         <h1 class="title">Places</h1>
         <ul>
-          <li v-for="p in places"><a @click="goto(p._idx)">{{p.name}}</a></li>
+          <li v-for="p in places"><a @click="goto(p._idx)">{{p.name}}</a>
+          <a :href="p.exturl" target="_blank"><i class="fa fa-external-link"></i></a></li>
         </ul>
       </div>
 

@@ -47,6 +47,16 @@ def index():
         MAPS_API_KEY = MAPS_API_KEY
     )
 
+@action('refine')
+@action.uses('refine.html', url_signer)
+def refine():
+    return dict(
+        # This is an example of a signed URL for the callback.
+        # See the index.html template for how this is passed to the javascript.
+        callback_url = URL('callback', signer=url_signer),
+        MAPS_API_KEY = MAPS_API_KEY
+    )
+
 @action('staticmap')
 @action.uses('staticmap.html', url_signer)
 def staticmap():
