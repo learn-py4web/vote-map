@@ -37,7 +37,6 @@ from . settings_private import MAPS_API_KEY
 
 url_signer = URLSigner(session)
 
-# The auth.user below forces login.
 @action('index')
 @action.uses('index.html', url_signer)
 def index():
@@ -48,3 +47,11 @@ def index():
         MAPS_API_KEY = MAPS_API_KEY
     )
 
+@action('staticmap')
+@action.uses('staticmap.html', url_signer)
+def index():
+    return dict(
+        # This is an example of a signed URL for the callback.
+        # See the index.html template for how this is passed to the javascript.
+        callback_url = URL('callback', signer=url_signer),
+    )

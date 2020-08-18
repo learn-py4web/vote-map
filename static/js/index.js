@@ -19,7 +19,7 @@ function initMap() {
     geolocate(info_window, map);
 
     add_location_button(map);
-
+    add_dropoff_maker_button(map);
     add_markers(map);
 }
 
@@ -42,10 +42,37 @@ function add_markers(map) {
 }
 
 
+function add_dropoff_maker_button(map) {
+    // Adds button to create a new dropoff location.
+    var control_div = document.createElement('div');
+    var add_marker_button = document.createElement('button');
+    add_marker_button.style.backgroundColor = '#f55';
+    add_marker_button.style.border = 'none';
+    add_marker_button.style.outline = 'none';
+    add_marker_button.style.borderRadius = '2px';
+    add_marker_button.style.boxShadow = '0 1px 4px rgba(0,0,0,0.3)';
+    add_marker_button.style.cursor = 'pointer';
+    add_marker_button.style.marginRight = '10px';
+    add_marker_button.style.padding = '10px';
+    add_marker_button.title = 'Add ballot dropoff';
+    control_div.appendChild(add_marker_button);
+
+    var marker_icon = document.createElement('i');
+    marker_icon.classList.add('fa', 'fa-2x', 'fa-map-marker');
+    add_marker_button.appendChild(marker_icon);
+
+    add_marker_button.addEventListener('click', function() {
+        // Click listener for creating new marker.
+    });
+
+    control_div.index = 2;
+    map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(control_div);
+}
+
 
 function add_location_button(map) {
-    var controlDiv = document.createElement('div');
-
+    // Adds button to go to current location.
+    var control_div = document.createElement('div');
     var location_button = document.createElement('button');
     location_button.style.backgroundColor = '#fff';
     location_button.style.border = 'none';
@@ -56,7 +83,7 @@ function add_location_button(map) {
     location_button.style.marginRight = '10px';
     location_button.style.padding = '10px';
     location_button.title = 'Your Location';
-    controlDiv.appendChild(location_button);
+    control_div.appendChild(location_button);
 
     var location_icon = document.createElement('i');
     location_icon.classList.add('fa', 'fa-2x', 'fa-crosshairs');
@@ -79,8 +106,8 @@ function add_location_button(map) {
         }
     });
 
-    controlDiv.index = 1;
-    map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(controlDiv);
+    control_div.index = 1;
+    map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(control_div);
 }
 
 function geolocate(info_window, map) {
