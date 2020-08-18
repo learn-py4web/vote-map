@@ -3,6 +3,7 @@
 
 var infoWindow;
 var map;
+var location_timeout = 4000;
 
 function initMap() {
     map = new google.maps.Map(
@@ -12,6 +13,50 @@ function initMap() {
         });
     infoWindow = new google.maps.InfoWindow();
     geolocate(infoWindow, map);
+
+    addYourLocationButton(map);
+}
+
+
+function addYourLocationButton(map)
+{
+    var controlDiv = document.createElement('div');
+
+    var firstChild = document.createElement('button');
+    firstChild.style.backgroundColor = '#fff';
+    firstChild.style.border = 'none';
+    firstChild.style.outline = 'none';
+    firstChild.style.borderRadius = '2px';
+    firstChild.style.boxShadow = '0 1px 4px rgba(0,0,0,0.3)';
+    firstChild.style.cursor = 'pointer';
+    firstChild.style.marginRight = '10px';
+    firstChild.style.padding = '10px';
+    firstChild.title = 'Your Location';
+    controlDiv.appendChild(firstChild);
+
+    var secondChild = document.createElement('i');
+    secondChild.classList.add('fa', 'fa-2x', 'fa-crosshairs');
+    firstChild.appendChild(secondChild);
+
+    firstChild.addEventListener('click', function() {
+        if(navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function(position) {
+                var latlng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+                var marker = new google.maps.Marker({
+                    map: map,
+                    animation: google.maps.Animation.DROP,
+                    position: latlng
+                });
+                marker.setPosition(latlng);
+                map.setCenter(latlng);
+            }, function () {}, {timeout: location_timeout});
+        }
+        else{
+        }
+    });
+
+    controlDiv.index = 1;
+    map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(controlDiv);
 }
 
 function geolocate(infoWindow, map) {
@@ -31,7 +76,7 @@ function geolocate(infoWindow, map) {
         }, function () {
             handleLocationError(true, infoWindow, map.getCenter());
         },
-            {timeout: 2000});
+            {timeout: location_timeout});
     } else {
         console.log("Location could not be determined.");
     }
