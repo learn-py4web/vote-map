@@ -8,8 +8,12 @@ var location_timeout = 4000;
 function initMap() {
     map = new google.maps.Map(
         document.getElementById('map'), {
-          center: {lat: 37, lng: -120},
-          zoom: 6
+            center: {lat: 37, lng: -120},
+            zoom: 6,
+            mapTypeControl: false,
+            mapTypeControlOptions: {
+                position: google.maps.ControlPosition.BOTTOM_LEFT,
+            }
         });
     infoWindow = new google.maps.InfoWindow();
     geolocate(infoWindow, map);
