@@ -49,9 +49,19 @@ def index():
 
 @action('staticmap')
 @action.uses('staticmap.html', url_signer)
-def index():
+def staticmap():
     return dict(
         # This is an example of a signed URL for the callback.
         # See the index.html template for how this is passed to the javascript.
         callback_url = URL('callback', signer=url_signer),
+    )
+
+@action('embedmap')
+@action.uses('embedmap.html', url_signer)
+def embedmap():
+    return dict(
+        # This is an example of a signed URL for the callback.
+        # See the index.html template for how this is passed to the javascript.
+        callback_url = URL('callback', signer=url_signer),
+        MAPS_API_KEY = MAPS_API_KEY
     )

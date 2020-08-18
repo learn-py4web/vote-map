@@ -1,0 +1,34 @@
+[[extend 'layout.html']]
+
+[[block page_head]]
+<link rel="stylesheet" href="css/embedmap.css">
+[[end]]
+
+<!--
+See https://developers.google.com/maps/documentation/urls/get-started
+-->
+
+<section class="section">
+
+  <div id="vue-target">
+
+    <h1 class="title">Places</h1>
+    <ul>
+      <li v-for="p in places"><a @click="goto(p._idx)">{{p.name}}</a></li>
+    </ul>
+
+    <iframe width="600" style="height:450px !important" height="450" frameborder="0" style="border:0"
+            :src="mapsurl" allowfullscreen></iframe>
+
+  </div>
+
+</section>
+
+[[block page_scripts]]
+<!-- Loads the index-specific js for Vue -->
+<script>
+  let maps_api_key = "[[=XML(MAPS_API_KEY)]]";
+  let callback_url = "[[=XML(callback_url)]]";
+</script>
+<script src="js/embedmap.js"></script>
+[[end]]
