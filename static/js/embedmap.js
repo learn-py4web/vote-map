@@ -1,6 +1,7 @@
 var places = [
-    {_idx: 0, 'name': 'Great Blue Heron', lat: 37.462910, lng: -121.997299},
-    {_idx: 1, 'name': "Nuttal's Woodpecker", lat: 37.785023, lng: -122.472527}
+    {_idx: 0, name: 'Great Blue Heron', lat: 37.462910, lng: -121.997299},
+    {_idx: 1, name: "Nuttal's Woodpecker", lat: 37.785023, lng: -122.472527},
+    {_idx: 2, name: "Napoletana Pizzeria", loc: "1910 W El Camino Real, Mountain View, CA 94040"}
 ];
 
 
@@ -39,8 +40,13 @@ let init = (app) => {
     // And this initializes it.
     app.init = () => {
         for (var p of places) {
-            p.url = "https://www.google.com/maps/embed/v1/place?key=" + maps_api_key
-                + "&q=" + p.lat + "," + p.lng;
+            if (p.lat !== undefined) {
+                p.url = "https://www.google.com/maps/embed/v1/place?key=" + maps_api_key
+                    + "&q=" + p.lat + "," + p.lng;
+            } else if (p.loc !== undefined) {
+                p.url = "https://www.google.com/maps/embed/v1/place?key=" + maps_api_key
+                    + "&q=" + encodeURIComponent(p.loc);
+            }
         }
         app.vue.places = places;
     };
