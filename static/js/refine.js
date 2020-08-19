@@ -54,6 +54,7 @@ function add_dropoff_maker_button(map) {
     add_marker_button.style.cursor = 'pointer';
     add_marker_button.style.margin = '10px';
     add_marker_button.style.padding = '12px';
+    add_marker_button.style.width = '40px';
     add_marker_button.title = 'Add ballot dropoff';
     control_div.appendChild(add_marker_button);
 
@@ -82,6 +83,7 @@ function add_location_button(map) {
     location_button.style.cursor = 'pointer';
     location_button.style.margin = '10px';
     location_button.style.padding = '10px';
+    location_button.style.width = '40px';
     location_button.title = 'Your Location';
     control_div.appendChild(location_button);
 
