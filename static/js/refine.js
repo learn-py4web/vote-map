@@ -151,11 +151,22 @@ let init = (app) => {
 
     // This is the Vue data.
     app.data = {
+        search_text: ""
     };
+
+    app.map_search = function (e) {
+        if (e.keyCode === 13) {
+            let requrl = "https://maps.googleapis.com/maps/api/geocode/json?";
+            requrl += "key=" + maps_api_key;
+            requrl += "&address=" + encodeURIComponent(app.vue.search_text);
+            console.log(requrl);
+        }
+    }
 
     // We form the dictionary of all methods, so we can assign them
     // to the Vue app in a single blow.
     app.methods = {
+        map_search: app.map_search
     };
 
     // This creates the Vue instance.
