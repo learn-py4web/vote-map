@@ -104,6 +104,8 @@ let init_vue = (app) => {
 
     // We initialize it later.
     app.marker_button = null;
+    app.map = null;
+    app.marker = null;
 
     // This is the Vue data.
     app.data = {
@@ -128,11 +130,19 @@ let init_vue = (app) => {
     app.add_marker_button = function (mapref) {
         // Adds a dropoff marker.
         app.marker_button = add_dropoff_maker_button(mapref, app);
+        app.map = mapref;
     };
 
     app.clicked_marker_button = function () {
         // Handle click of button to add marker.
         console.log("clicked");
+        // Puts a marker in the map center.
+        let c = app.map.getCenter();
+        app.marker = new google.maps.Marker({
+            position: c,
+            title: "Great Blue Heron"
+        });
+        app.marker.setMap(app.map);
     };
 
     // This creates the Vue instance.
@@ -195,7 +205,7 @@ function initMap() {
     info_window = new google.maps.InfoWindow();
     geolocate(info_window, map);
     add_location_button(map);
-    add_markers(map);
+    // add_markers(map);
     app.add_marker_button(map);
 }
 
