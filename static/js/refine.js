@@ -140,7 +140,8 @@ let init_vue = (app) => {
         let c = app.map.getCenter();
         app.marker = new google.maps.Marker({
             position: c,
-            title: "Great Blue Heron"
+            draggable: true,
+            label: 'A'
         });
         app.marker.setMap(app.map);
     };
