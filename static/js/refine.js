@@ -5,24 +5,6 @@ var info_window;
 var map;
 var location_timeout = 4000;
 
-function initMap() {
-    map = new google.maps.Map(
-        document.getElementById('map'), {
-            center: {lat: 37, lng: -120},
-            zoom: 6,
-            mapTypeControl: false,
-            mapTypeControlOptions: {
-                position: google.maps.ControlPosition.BOTTOM_LEFT,
-            }
-        });
-    info_window = new google.maps.InfoWindow();
-    geolocate(info_window, map);
-
-    add_location_button(map);
-    add_dropoff_maker_button(map);
-    add_markers(map);
-}
-
 
 function add_markers(map) {
     let lat = 37.462910;
@@ -68,6 +50,7 @@ function add_dropoff_maker_button(map) {
 
     control_div.index = 1;
     map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(control_div);
+    return add_marker_button;
 }
 
 
@@ -143,11 +126,14 @@ function handleLocationError(browserHasGeolocation, infoWindow, pos) {
 
 // This will be the object that will contain the Vue attributes
 // and be used to initialize it.
-let app = {};
+var app = {};
 
 // Given an empty app object, initializes it filling its attributes,
 // creates a Vue instance, and then initializes the Vue instance.
-let init = (app) => {
+let init_vue = (app) => {
+
+    // We initialize it later.
+    app.marker_button = null;
 
     // This is the Vue data.
     app.data = {
@@ -169,6 +155,11 @@ let init = (app) => {
         map_search: app.map_search
     };
 
+    app.add_marker_button = function (mapref) {
+        // Adds a dropoff marker.
+        app.marker_button = add_dropoff_maker_button(mapref);
+    };
+
     // This creates the Vue instance.
     app.vue = new Vue({
         el: "#vue-target",
@@ -184,6 +175,22 @@ let init = (app) => {
     app.init();
 };
 
-// This takes the (empty) app object, and initializes it,
-// putting all the code i
-init(app);
+init_vue(app); // Init Vue.
+
+function initMap() {
+    map = new google.maps.Map(
+        document.getElementById('map'), {
+            center: {lat: 37, lng: -120},
+            zoom: 6,
+            mapTypeControl: false,
+            mapTypeControlOptions: {
+                position: google.maps.ControlPosition.BOTTOM_LEFT,
+            }
+        });
+    info_window = new google.maps.InfoWindow();
+    geolocate(info_window, map);
+    add_location_button(map);
+    add_markers(map);
+    app.add_marker_button(map);
+}
+
