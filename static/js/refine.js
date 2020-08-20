@@ -24,36 +24,6 @@ function add_markers(map) {
 }
 
 
-function add_dropoff_maker_button(map) {
-    // Adds button to create a new dropoff location.
-    let control_div = document.createElement('div');
-    let add_marker_button = document.createElement('button');
-    add_marker_button.style.backgroundColor = '#f55';
-    add_marker_button.style.border = 'none';
-    add_marker_button.style.outline = 'none';
-    add_marker_button.style.borderRadius = '2px';
-    add_marker_button.style.boxShadow = '0 1px 4px rgba(0,0,0,0.3)';
-    add_marker_button.style.cursor = 'pointer';
-    add_marker_button.style.margin = '10px';
-    add_marker_button.style.padding = '12px';
-    add_marker_button.style.width = '40px';
-    add_marker_button.title = 'Add ballot dropoff';
-    control_div.appendChild(add_marker_button);
-
-    let marker_icon = document.createElement('i');
-    marker_icon.classList.add('fa', 'fa-2x', 'fa-map-marker');
-    add_marker_button.appendChild(marker_icon);
-
-    add_marker_button.addEventListener('click', function() {
-        // Click listener for creating new marker.
-    });
-
-    control_div.index = 1;
-    map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(control_div);
-    return add_marker_button;
-}
-
-
 function add_location_button(map) {
     // Adds button to go to current location.
     let control_div = document.createElement('div');
@@ -157,7 +127,12 @@ let init_vue = (app) => {
 
     app.add_marker_button = function (mapref) {
         // Adds a dropoff marker.
-        app.marker_button = add_dropoff_maker_button(mapref);
+        app.marker_button = add_dropoff_maker_button(mapref, app);
+    };
+
+    app.clicked_marker_button = function () {
+        // Handle click of button to add marker.
+        console.log("clicked");
     };
 
     // This creates the Vue instance.
@@ -176,6 +151,36 @@ let init_vue = (app) => {
 };
 
 init_vue(app); // Init Vue.
+
+function add_dropoff_maker_button(map, vue_app) {
+    // Adds button to create a new dropoff location.
+    let control_div = document.createElement('div');
+    let add_marker_button = document.createElement('button');
+    add_marker_button.style.backgroundColor = '#f55';
+    add_marker_button.style.border = 'none';
+    add_marker_button.style.outline = 'none';
+    add_marker_button.style.borderRadius = '2px';
+    add_marker_button.style.boxShadow = '0 1px 4px rgba(0,0,0,0.3)';
+    add_marker_button.style.cursor = 'pointer';
+    add_marker_button.style.margin = '10px';
+    add_marker_button.style.padding = '12px';
+    add_marker_button.style.width = '40px';
+    add_marker_button.title = 'Add ballot dropoff';
+    control_div.appendChild(add_marker_button);
+
+    let marker_icon = document.createElement('i');
+    marker_icon.classList.add('fa', 'fa-2x', 'fa-map-marker');
+    add_marker_button.appendChild(marker_icon);
+
+    add_marker_button.addEventListener('click', function() {
+        // Click listener for creating new marker.
+        vue_app.clicked_marker_button();
+    });
+
+    control_div.index = 1;
+    map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(control_div);
+    return add_marker_button;
+}
 
 function initMap() {
     map = new google.maps.Map(
