@@ -11,8 +11,15 @@
     <div class="columns">
       <div class="column is-one-third">
         <!-- List of places -->
-          <div class="title is-size-4">Ballot Drop-Off Locations</div>
-
+        <div class="title is-size-4">Ballot Drop-Off Locations</div>
+        <table class="table is-narrow is-hoverable location_list">
+          <tbody>
+            <tr v-for="loc in locations" @click="edit_loc(loc._idx)" :class="{'is-active': loc.is_active}">
+              <td class="location_label" >{{loc.label}}</td>
+              <td class="location_name">{{loc.name}}</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
 
       <div class="column">

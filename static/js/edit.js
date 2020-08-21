@@ -59,12 +59,43 @@ let init_vue = (app) => {
                 }
             });
         }
-    }
+    };
+
+    app.edit_loc = function (loc_idx) {
+        // TODO
+    };
+
+    app.reindex_locations = function (locations) {
+        let idx = 0;
+        for (let loc of locations) {
+            loc._idx = idx++;
+            loc.is_active = false;
+            loc.is_edited = false;
+        }
+        return locations;
+    };
+
+    app.load_locations = function () {
+        // Gets the current bounds, and loads the locations.
+        let bounds = app.map.getBounds();
+        let ne = bounds.getNorthEast();
+        let sw = bounds.getSouthWest();
+        axios.get(callback_url, {
+            params: {
+                lat_max: ne.lat, lat_min: sw.lat,
+                lng_max: sw.lng, lng_min: ne.lng
+            }}).then(function (response) {
+                if (response.status === 200) {
+                    app.vue.locations = app.reindex_locations(response.data.locations);
+                }
+        });
+    };
 
     // We form the dictionary of all methods, so we can assign them
     // to the Vue app in a single blow.
     app.methods = {
-        map_search: app.map_search
+        map_search: app.map_search,
+        edit_loc: app.edit_loc
     };
 
     // This creates the Vue instance.
@@ -81,6 +112,8 @@ let init_vue = (app) => {
     // Map setter.
     app.set_map = function (map) {
         app.map = map;
+        // Gets the list of locations.
+        app.load_locations();
     };
 
     // Call to the initializer.
