@@ -7,13 +7,32 @@
 <section class="section">
 
   <div id="vue-target">
-    <div class="field">
-      <div class="control has-icons-right">
-        <input class="input" v-model="search_text" @keydown="map_search">
-        <span class="icon is-small is-right"><i class="fa fa-search"></i></span>
+
+    <div class="columns">
+      <div class="column is-one-third">
+        <!-- List of places -->
+
+      </div>
+
+      <div class="column">
+        <!-- Search for map positioning -->
+        <div class="field">
+          <div class="control has-icons-right">
+            <input class="input" v-model="search_text" placeholder="Address of map center" @keydown="map_search">
+            <span class="icon is-small is-right"><i class="fa fa-search"></i></span>
+          </div>
+        </div>
+
+        <!-- Map -->
+        <div id="map"></div>
+          <div class="title">Ballot </div>
+        <!-- Place edit -->
+        <div class="editfield">
+          Hello.
+        </div>
       </div>
     </div>
-    <div id="map"></div>
+
 
   </div>
 

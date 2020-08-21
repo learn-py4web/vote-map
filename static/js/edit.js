@@ -1,10 +1,8 @@
 
 // Map and its initialization.
 
-var info_window;
 var map;
 var location_timeout = 4000;
-
 
 function add_markers(map) {
     let lat = 37.462910;
@@ -22,76 +20,6 @@ function add_markers(map) {
     })
     marker.setMap(map);
 }
-
-
-function add_location_button(map) {
-    // Adds button to go to current location.
-    let control_div = document.createElement('div');
-    let location_button = document.createElement('button');
-    location_button.style.backgroundColor = '#fff';
-    location_button.style.border = 'none';
-    location_button.style.outline = 'none';
-    location_button.style.borderRadius = '2px';
-    location_button.style.boxShadow = '0 1px 4px rgba(0,0,0,0.3)';
-    location_button.style.cursor = 'pointer';
-    location_button.style.margin = '10px';
-    location_button.style.padding = '10px';
-    location_button.style.width = '40px';
-    location_button.title = 'Your Location';
-    control_div.appendChild(location_button);
-
-    let location_icon = document.createElement('i');
-    location_icon.classList.add('fa', 'fa-2x', 'fa-crosshairs');
-    location_button.appendChild(location_icon);
-
-    location_button.addEventListener('click', function() {
-        if(navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(function(position) {
-                var latlng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-                var marker = new google.maps.Marker({
-                    map: map,
-                    animation: google.maps.Animation.DROP,
-                    position: latlng
-                });
-                marker.setPosition(latlng);
-                map.setCenter(latlng);
-            }, function () {}, {timeout: location_timeout});
-        }
-        else{
-        }
-    });
-
-    control_div.index = 1;
-    map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(control_div);
-}
-
-function geolocate(info_window, map) {
-// Try HTML5 geolocation.
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(function (position) {
-            console.log("Gotten position:", position.coords)
-            var pos = {
-                lat: position.coords.latitude,
-                lng: position.coords.longitude
-            };
-
-            info_window.setPosition(pos);
-            info_window.setContent('Location found.');
-            info_window.open(map);
-            map.setCenter(pos);
-        }, function () {
-            handleLocationError(true, info_window, map.getCenter());
-        },
-            {timeout: location_timeout});
-    } else {
-        console.log("Location could not be determined.");
-    }
-}
-
-function handleLocationError(browserHasGeolocation, infoWindow, pos) {
-    console.log("Location could not be determined.");
-}
-
 
 
 // This will be the object that will contain the Vue attributes
@@ -118,6 +46,18 @@ let init_vue = (app) => {
             requrl += "key=" + maps_api_key;
             requrl += "&address=" + encodeURIComponent(app.vue.search_text);
             console.log(requrl);
+            axios.get(requrl).then(function (response) {
+                console.log(response);
+                if (response.status === 200 && response.data.status === "OK") {
+                    if (response.data.results.length > 0) {
+                        let first_result = response.data.results[0];
+                        let lat = first_result.geometry.location.lat;
+                        let lng = first_result.geometry.location.lng;
+                        app.map.setCenter({lat: lat, lng: lng});
+                        app.map.setZoom(14);
+                    }
+                }
+            });
         }
     }
 
@@ -125,25 +65,6 @@ let init_vue = (app) => {
     // to the Vue app in a single blow.
     app.methods = {
         map_search: app.map_search
-    };
-
-    app.add_marker_button = function (mapref) {
-        // Adds a dropoff marker.
-        app.marker_button = add_dropoff_maker_button(mapref, app);
-        app.map = mapref;
-    };
-
-    app.clicked_marker_button = function () {
-        // Handle click of button to add marker.
-        console.log("clicked");
-        // Puts a marker in the map center.
-        let c = app.map.getCenter();
-        app.marker = new google.maps.Marker({
-            position: c,
-            draggable: true,
-            label: 'A'
-        });
-        app.marker.setMap(app.map);
     };
 
     // This creates the Vue instance.
@@ -157,56 +78,40 @@ let init_vue = (app) => {
     app.init = () => {
     };
 
+    // Map setter.
+    app.set_map = function (map) {
+        app.map = map;
+    };
+
     // Call to the initializer.
     app.init();
 };
 
 init_vue(app); // Init Vue.
 
-function add_dropoff_maker_button(map, vue_app) {
-    // Adds button to create a new dropoff location.
-    let control_div = document.createElement('div');
-    let add_marker_button = document.createElement('button');
-    add_marker_button.style.backgroundColor = '#f55';
-    add_marker_button.style.border = 'none';
-    add_marker_button.style.outline = 'none';
-    add_marker_button.style.borderRadius = '2px';
-    add_marker_button.style.boxShadow = '0 1px 4px rgba(0,0,0,0.3)';
-    add_marker_button.style.cursor = 'pointer';
-    add_marker_button.style.margin = '10px';
-    add_marker_button.style.padding = '12px';
-    add_marker_button.style.width = '40px';
-    add_marker_button.title = 'Add ballot dropoff';
-    control_div.appendChild(add_marker_button);
-
-    let marker_icon = document.createElement('i');
-    marker_icon.classList.add('fa', 'fa-2x', 'fa-map-marker');
-    add_marker_button.appendChild(marker_icon);
-
-    add_marker_button.addEventListener('click', function() {
-        // Click listener for creating new marker.
-        vue_app.clicked_marker_button();
-    });
-
-    control_div.index = 1;
-    map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(control_div);
-    return add_marker_button;
-}
 
 function initMap() {
+    // Can we find the latest location from localstorage?
+    let lat = 37;
+    let lng = -120;
+    let zoom = 6;
+    let local_storage = window.localStorage;
+    let loc_str = local_storage.getItem("latlong");
+    if (loc_str) {
+        let loc = JSON.parse(loc_str);
+        lat = loc.lat;
+        lng = loc.lng;
+        zoom = loc.zoom;
+    }
     map = new google.maps.Map(
         document.getElementById('map'), {
-            center: {lat: 37, lng: -120},
-            zoom: 6,
+            center: {lat: lat, lng: lng},
+            zoom: zoom,
             mapTypeControl: false,
             mapTypeControlOptions: {
                 position: google.maps.ControlPosition.BOTTOM_LEFT,
             }
         });
-    info_window = new google.maps.InfoWindow();
-    geolocate(info_window, map);
-    add_location_button(map);
-    // add_markers(map);
-    app.add_marker_button(map);
+    app.set_map(map);
 }
 
