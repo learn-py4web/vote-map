@@ -75,3 +75,13 @@ def embedmap():
         callback_url = URL('callback', signer=url_signer),
         MAPS_API_KEY = MAPS_API_KEY
     )
+
+@action('edit')
+@action.uses('edit.html', url_signer)
+def edit():
+    return dict(
+        # This is an example of a signed URL for the callback.
+        # See the index.html template for how this is passed to the javascript.
+        callback_url = URL('callback', signer=url_signer),
+        MAPS_API_KEY = MAPS_API_KEY
+    )
