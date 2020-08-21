@@ -11,6 +11,7 @@
     <div class="columns">
       <div class="column is-one-third">
         <!-- List of places -->
+          <div class="title is-size-4">Ballot Drop-Off Locations</div>
 
       </div>
 
@@ -18,14 +19,13 @@
         <!-- Search for map positioning -->
         <div class="field">
           <div class="control has-icons-right">
-            <input class="input" v-model="search_text" placeholder="Address of map center" @keydown="map_search">
+            <input class="input" v-model="search_text" placeholder="Center map on address" @keydown="map_search">
             <span class="icon is-small is-right"><i class="fa fa-search"></i></span>
           </div>
         </div>
 
         <!-- Map -->
         <div id="map"></div>
-          <div class="title">Ballot </div>
         <!-- Place edit -->
         <div class="editfield">
           Hello.
