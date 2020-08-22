@@ -34,6 +34,7 @@ from py4web.utils.url_signer import URLSigner
 from yatl.helpers import A
 from . common import db, session, T, cache, auth, signed_url
 from . settings_private import MAPS_API_KEY
+from .test_data import TEST_LOCATIONS
 
 url_signer = URLSigner(session)
 
@@ -46,6 +47,33 @@ def index():
         callback_url = URL('callback', signer=url_signer),
         MAPS_API_KEY = MAPS_API_KEY
     )
+
+@action('edit')
+@action.uses('edit.html', url_signer, auth.user)
+def edit():
+    return dict(
+        # This is an example of a signed URL for the callback.
+        # See the index.html template for how this is passed to the javascript.
+        callback_url = URL('edit_callback', signer=url_signer),
+        MAPS_API_KEY = MAPS_API_KEY
+    )
+
+
+@action('edit_callback', method='GET')
+@action.uses(url_signer.verify())
+def edit_callback():
+    lat_max = request.params.get('lat_max')
+    lat_min = request.params.get('lat_min')
+    lng_max = request.params.get('lng_max')
+    lng_min = request.params.get('lng_min')
+    return dict(
+        locations=TEST_LOCATIONS
+    )
+
+
+
+###############################################
+# Old below
 
 @action('refine')
 @action.uses('refine.html', url_signer)
@@ -76,12 +104,3 @@ def embedmap():
         MAPS_API_KEY = MAPS_API_KEY
     )
 
-@action('edit')
-@action.uses('edit.html', url_signer)
-def edit():
-    return dict(
-        # This is an example of a signed URL for the callback.
-        # See the index.html template for how this is passed to the javascript.
-        callback_url = URL('callback', signer=url_signer),
-        MAPS_API_KEY = MAPS_API_KEY
-    )

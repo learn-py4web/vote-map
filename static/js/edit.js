@@ -30,17 +30,16 @@ var app = {};
 // creates a Vue instance, and then initializes the Vue instance.
 let init_vue = (app) => {
 
-    // We initialize it later.
-    app.marker_button = null;
-    app.map = null;
-    app.marker = null;
+    app.map = null; // The map
+    app.initial_load = true; // To load locations initially only.
 
     // This is the Vue data.
     app.data = {
-        search_text: ""
+        search_text: "",
+        locations: [],
     };
 
-    app.map_search = function (e) {
+    app.map_center = function (e) {
         if (e.keyCode === 13) {
             let requrl = "https://maps.googleapis.com/maps/api/geocode/json?";
             requrl += "key=" + maps_api_key;
@@ -71,9 +70,59 @@ let init_vue = (app) => {
             loc._idx = idx++;
             loc.is_active = false;
             loc.is_edited = false;
+            // Creates a marker for displaying the location.
+            loc.marker = new google.maps.Marker({
+                position: {lat: loc.lat, lng: loc.lng},
+                map: app.map,
+                title: (idx + 1).toString()
+            });
         }
         return locations;
     };
+
+    app.show_markers = function () {
+        for (let loc of app.vue.locations) {
+            loc.marker.setMap(app.map);
+        }
+    };
+
+    app.hide_markers = function () {
+        for (let loc of app.vue.locations) {
+            loc.marker.setMap();
+        }
+    };
+
+    app.hide_all_but_one_marker = function (idx) {
+        for (let i = 0; i < app.vue.locations.length; i++) {
+            if (i === idx) {
+                app.vue.locations[i].setMap(app.map);
+            } else {
+                app.vue.locations[i].setMap();
+            }
+        }
+    };
+
+    app.load_locations_once = function () {
+        if (app.initial_load) {
+            app.initial_load = false;
+            app.load_locations();
+        }
+    };
+
+    app.map_moved = function () {
+        // The map moved.  Stores the new location in local storage, and
+        // fetches the locations.
+        try {
+            let c = app.map.getCenter();
+            let z = app.map.getZoom();
+            window.localStorage.setItem("latlong", JSON.stringify({
+                lat: c.lat(),
+                lng: c.lng(),
+                zoom: z
+            }));
+        } catch (e) {}
+        app.load_locations();
+    }
 
     app.load_locations = function () {
         // Gets the current bounds, and loads the locations.
@@ -82,8 +131,8 @@ let init_vue = (app) => {
         let sw = bounds.getSouthWest();
         axios.get(callback_url, {
             params: {
-                lat_max: ne.lat, lat_min: sw.lat,
-                lng_max: sw.lng, lng_min: ne.lng
+                lat_max: ne.lat(), lat_min: sw.lat(),
+                lng_max: sw.lng(), lng_min: ne.lng()
             }}).then(function (response) {
                 if (response.status === 200) {
                     app.vue.locations = app.reindex_locations(response.data.locations);
@@ -91,10 +140,21 @@ let init_vue = (app) => {
         });
     };
 
+    app.display_locations = function () {
+        // Displays all locations.
+        for (let loc of app.vue.locations) {
+            app.display_location(loc);
+        }
+    };
+
+    app.display_location = function (loc) {
+        // displays location loc on the map.
+    }
+
     // We form the dictionary of all methods, so we can assign them
     // to the Vue app in a single blow.
     app.methods = {
-        map_search: app.map_search,
+        map_center: app.map_center,
         edit_loc: app.edit_loc
     };
 
@@ -112,8 +172,12 @@ let init_vue = (app) => {
     // Map setter.
     app.set_map = function (map) {
         app.map = map;
-        // Gets the list of locations.
-        app.load_locations();
+        // Yes, it's silly, but there is no init event that tells us
+        // when the map is loaded.  So we listen to bounds_changed, but
+        // only once, and we load the locations.  Otherwise, we load the
+        // locations only on drag_end, to save on loads.
+        map.addListener('bounds_changed', app.load_locations_once);
+        map.addListener('dragend', app.map_moved);
     };
 
     // Call to the initializer.
@@ -128,19 +192,23 @@ function initMap() {
     let lat = 37;
     let lng = -120;
     let zoom = 6;
-    let local_storage = window.localStorage;
-    let loc_str = local_storage.getItem("latlong");
-    if (loc_str) {
-        let loc = JSON.parse(loc_str);
-        lat = loc.lat;
-        lng = loc.lng;
-        zoom = loc.zoom;
-    }
+    try {
+        let local_storage = window.localStorage;
+        let loc_str = local_storage.getItem("latlong");
+        if (loc_str) {
+            let loc = JSON.parse(loc_str);
+            lat = loc.lat;
+            lng = loc.lng;
+            zoom = loc.zoom;
+        }
+    } catch (e) {}
     map = new google.maps.Map(
         document.getElementById('map'), {
             center: {lat: lat, lng: lng},
             zoom: zoom,
-            mapTypeControl: false,
+            mapTypeControl: true,
+            streetViewControl: false,
+            fullscreenControl: false,
             mapTypeControlOptions: {
                 position: google.maps.ControlPosition.BOTTOM_LEFT,
             }
