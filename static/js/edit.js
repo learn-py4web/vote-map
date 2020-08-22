@@ -18,6 +18,11 @@ let init_vue = (app) => {
     app.data = {
         search_text: "",
         locations: [],
+        mode: "browse", // "browse" or "edit".
+        // Fields.
+        loc_name: "",
+        loc_type: "Polling site",
+        loc_type_other: "",
     };
 
     app.map_center = function (e) {
@@ -45,7 +50,7 @@ let init_vue = (app) => {
         console.log("Clicked on " + idx);
         let loc = app.vue.locations[idx];
         app.hide_all_but_one_marker(idx);
-
+        app.vue.mode = "edit";
     };
 
     app.reindex_locations = function (locations) {

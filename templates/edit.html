@@ -10,18 +10,40 @@
 
     <div class="columns">
       <div class="column is-one-third">
-        <!-- List of places -->
-        <div class="title is-size-4">Ballot Drop-Off Locations
-          <button class="button is-light"><i class="fa fa-plus"></i></button>
+        <div v-if="mode === 'browse'">
+          <!-- List of places -->
+          <div class="title is-size-4">Ballot Drop-Off Locations
+            <button class="button is-light"><i class="fa fa-plus"></i></button>
+          </div>
+          <table class="table is-narrow is-hoverable is-fullwidth location_list">
+            <tbody>
+              <tr v-for="loc in locations" @click="edit_loc(loc._idx)" :class="{'is-active': loc.is_active}">
+                <td class="location_label" >{{loc.label}}</td>
+                <td class="location_name">{{loc.name}}</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-        <table class="table is-narrow is-hoverable is-fullwidth location_list">
-          <tbody>
-            <tr v-for="loc in locations" @click="edit_loc(loc._idx)" :class="{'is-active': loc.is_active}">
-              <td class="location_label" >{{loc.label}}</td>
-              <td class="location_name">{{loc.name}}</td>
-            </tr>
-          </tbody>
-        </table>
+        <!-- Edit/add of one location -->
+        <div v-else>
+          <div class="editform">
+            <div class="field">
+              <label for="name" class="label">Name</label>
+              <input class="input" placeholder="Location name" v-model="loc_name">
+            </div>
+            <div class="field">
+              <label for="loc_type" class="label">Location type</label>
+              <div class="select">
+                <select v-model="loc_type">
+                  <option value="Polling site">Polling site</option>
+                  <option value="Ballot drop box">Ballot drop box</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+              <input class="input" placeholder="Type of location" v-if="loc_type==='Other'" v-model="loc_type_other">
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="column">
