@@ -68,13 +68,14 @@ let init_vue = (app) => {
         let idx = 0;
         for (let loc of locations) {
             loc._idx = idx++;
+            loc.label = idx.toString();
             loc.is_active = false;
             loc.is_edited = false;
             // Creates a marker for displaying the location.
             loc.marker = new google.maps.Marker({
                 position: {lat: loc.lat, lng: loc.lng},
                 map: app.map,
-                title: (idx + 1).toString()
+                label: loc.label
             });
         }
         return locations;
