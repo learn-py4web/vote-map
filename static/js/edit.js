@@ -2,25 +2,6 @@
 // Map and its initialization.
 
 var map;
-var location_timeout = 4000;
-
-function add_markers(map) {
-    let lat = 37.462910;
-    let lng = -121.997299;
-    let latlng = new google.maps.LatLng(lat, lng);
-    var marker = new google.maps.Marker({
-        position: latlng,
-        title: "Great Blue Heron"
-    });
-    const infowindow = new google.maps.InfoWindow({
-        content: '<h1 class="is-size-5 has-text-weight-semibold">Great Blue Heron</h1>'
-    });
-    marker.addListener("click", () => {
-        infowindow.open(map, marker);
-    })
-    marker.setMap(map);
-}
-
 
 // This will be the object that will contain the Vue attributes
 // and be used to initialize it.
@@ -60,8 +41,11 @@ let init_vue = (app) => {
         }
     };
 
-    app.edit_loc = function (loc_idx) {
-        // TODO
+    app.edit_loc = function (idx) {
+        console.log("Clicked on " + idx);
+        let loc = app.vue.locations[idx];
+        app.hide_all_but_one_marker(idx);
+
     };
 
     app.reindex_locations = function (locations) {
@@ -76,6 +60,9 @@ let init_vue = (app) => {
                 position: {lat: loc.lat, lng: loc.lng},
                 map: app.map,
                 label: loc.label
+            });
+            loc.marker.addListener('click', function () {
+                app.edit_loc(loc._idx);
             });
         }
         return locations;
@@ -96,9 +83,9 @@ let init_vue = (app) => {
     app.hide_all_but_one_marker = function (idx) {
         for (let i = 0; i < app.vue.locations.length; i++) {
             if (i === idx) {
-                app.vue.locations[i].setMap(app.map);
+                app.vue.locations[i].marker.setMap(app.map);
             } else {
-                app.vue.locations[i].setMap();
+                app.vue.locations[i].marker.setMap();
             }
         }
     };

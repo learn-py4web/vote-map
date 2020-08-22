@@ -11,7 +11,9 @@
     <div class="columns">
       <div class="column is-one-third">
         <!-- List of places -->
-        <div class="title is-size-4">Ballot Drop-Off Locations</div>
+        <div class="title is-size-4">Ballot Drop-Off Locations
+          <button class="button is-light"><i class="fa fa-plus"></i></button>
+        </div>
         <table class="table is-narrow is-hoverable is-fullwidth location_list">
           <tbody>
             <tr v-for="loc in locations" @click="edit_loc(loc._idx)" :class="{'is-active': loc.is_active}">
