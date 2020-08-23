@@ -29,18 +29,48 @@
           <div class="editform">
             <div class="field">
               <label for="name" class="label">Name</label>
-              <input class="input" placeholder="Location name" v-model="loc_name">
+              <input class="input" placeholder="Location name" v-model="eloc.name">
+            </div>
+            <div class="field">
+              <label class="label">Address</label>
+              <textarea class="textarea" v-model="eloc.address" rows="2"></textarea>
+              <button class="button is-light" @click="move_marker_to_address"><i class="fa fa-crosshairs"></i></button>
             </div>
             <div class="field">
               <label for="loc_type" class="label">Location type</label>
               <div class="select">
-                <select v-model="loc_type">
+                <select v-model="eloc.type">
                   <option value="Polling site">Polling site</option>
                   <option value="Ballot drop box">Ballot drop box</option>
                   <option value="Other">Other</option>
                 </select>
               </div>
-              <input class="input" placeholder="Type of location" v-if="loc_type==='Other'" v-model="loc_type_other">
+              <input class="input" placeholder="Type of location" v-if="eloc.type==='Other'" v-model="eloc.type_other">
+            </div>
+            <div class="field">
+              <label class="label">Rules</label>
+              <textarea class="textarea" v-model="eloc.rules" rows="2" placeholder="Who can bring ballots, can one bring them for others, ..."></textarea>
+            </div>
+            <div class="field">
+              <label class="label">Open from date</label>
+              <input class="input" type="date" v-model="eloc.date_open">
+            </div>
+            <div class="field">
+              <label class="label">Closing on date</label>
+              <input class="input" type="date" v-model="eloc.date_close">
+            </div>
+            <div class="field">
+              <label class="label">Daily opening time</label>
+              <input class="input" type="time" v-model="eloc.time_open">
+            </div>
+            <div class="field">
+              <label class="label">Daily closing time</label>
+              <input class="input" type="time" v-model="eloc.time_close">
+              <p class="has-text-grey">Leave times blank if open all day</p>
+            </div>
+            <div class="field is-grouped">
+              <p class="control"><button class="button is-danger" @click="cancel_edit"><span class="icon is-small"><i class="fa fa-chevron-left"></i></span><span>Cancel</span></button></p>
+              <p class="control"><button class="button is-info" @click="save_edit"><span class="icon is-small"><i class="fa fa-check"></i></span><span>Save</span></button></p>
             </div>
           </div>
         </div>
@@ -57,10 +87,6 @@
 
         <!-- Map -->
         <div id="map"></div>
-        <!-- Place edit -->
-        <div class="editfield">
-          Hello.
-        </div>
       </div>
     </div>
 

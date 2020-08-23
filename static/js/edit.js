@@ -20,9 +20,7 @@ let init_vue = (app) => {
         locations: [],
         mode: "browse", // "browse" or "edit".
         // Fields.
-        loc_name: "",
-        loc_type: "Polling site",
-        loc_type_other: "",
+        eloc: {},
     };
 
     app.map_center = function (e) {
@@ -51,6 +49,8 @@ let init_vue = (app) => {
         let loc = app.vue.locations[idx];
         app.hide_all_but_one_marker(idx);
         app.vue.mode = "edit";
+        // Loads the edit fields.
+        app.vue.eloc = {...loc};
     };
 
     app.reindex_locations = function (locations) {
@@ -144,11 +144,16 @@ let init_vue = (app) => {
         // displays location loc on the map.
     }
 
+    app.move_marker_to_address = function () {
+        // TODO
+    }
+
     // We form the dictionary of all methods, so we can assign them
     // to the Vue app in a single blow.
     app.methods = {
         map_center: app.map_center,
-        edit_loc: app.edit_loc
+        edit_loc: app.edit_loc,
+        move_marker_to_address: app.move_marker_to_address
     };
 
     // This creates the Vue instance.
