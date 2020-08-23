@@ -39,13 +39,13 @@
             <div class="field">
               <label for="loc_type" class="label">Location type</label>
               <div class="select">
-                <select v-model="eloc.type">
+                <select v-model="eloc.loc_type">
                   <option value="Polling site">Polling site</option>
                   <option value="Ballot drop box">Ballot drop box</option>
                   <option value="Other">Other</option>
                 </select>
               </div>
-              <input class="input" placeholder="Type of location" v-if="eloc.type==='Other'" v-model="eloc.type_other">
+              <input class="input" placeholder="Type of location" v-if="eloc.loc_type==='Other'" v-model="eloc.type_other">
             </div>
             <div class="field">
               <label class="label">Rules</label>
@@ -68,7 +68,13 @@
               <input class="input" type="time" v-model="eloc.time_close">
               <p class="has-text-grey">Leave times blank if open all day</p>
             </div>
+            <div class="field">
+              <label class="label">Deleted</label>
+              <input class="input" type="checkbox" v-model="eloc.is_deleted">
+              Deleted
+            </div>
             <div class="field is-grouped">
+              <p class="control"><button class="button is-success" @click="confirm"><span class="icon is-small"><i class="fa fa-thumbs-up"></i></span><span>Confirm: correct</span></button></p>
               <p class="control"><button class="button is-danger" @click="cancel_edit"><span class="icon is-small"><i class="fa fa-chevron-left"></i></span><span>Cancel</span></button></p>
               <p class="control"><button class="button is-info" @click="save_edit"><span class="icon is-small"><i class="fa fa-check"></i></span><span>Save</span></button></p>
             </div>
@@ -87,6 +93,11 @@
 
         <!-- Map -->
         <div id="map"></div>
+
+        <div class="field">
+          <input class="input" type="checkbox" v-model="include_deleted">
+          Include deleted locations
+        </div>
       </div>
     </div>
 

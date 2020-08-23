@@ -13,12 +13,14 @@ let init_vue = (app) => {
 
     app.map = null; // The map
     app.initial_load = true; // To load locations initially only.
+    app.edited_idx = null;
 
     // This is the Vue data.
     app.data = {
         search_text: "",
         locations: [],
         mode: "browse", // "browse" or "edit".
+        include_deleted: false, // Include deleted locations when editing.
         // Fields.
         eloc: {},
     };
@@ -47,10 +49,29 @@ let init_vue = (app) => {
     app.edit_loc = function (idx) {
         console.log("Clicked on " + idx);
         let loc = app.vue.locations[idx];
+        app.edited_idx = idx;
         app.hide_all_but_one_marker(idx);
         app.vue.mode = "edit";
         // Loads the edit fields.
         app.vue.eloc = {...loc};
+    };
+
+    app.cancel_edit = function () {
+        app.edited_idx = null;
+        app.vue.mode = "browse";
+        app.show_markers();
+    };
+
+    app.save_edit = function () {
+        let loc = app.vue.locations[app.edited_idx];
+        for (let p in app.vue.eloc) {
+            loc[p] = app.vue.eloc[p];
+        }
+        console.log("New:", loc)
+        app.edited_idx = null;
+        app.vue.mode = "browse";
+        app.show_markers();
+        axios.post(callback_url, loc);
     };
 
     app.reindex_locations = function (locations) {
@@ -125,7 +146,8 @@ let init_vue = (app) => {
         axios.get(callback_url, {
             params: {
                 lat_max: ne.lat(), lat_min: sw.lat(),
-                lng_max: sw.lng(), lng_min: ne.lng()
+                lng_min: sw.lng(), lng_max: ne.lng(),
+                include_deleted: app.vue.include_deleted,
             }}).then(function (response) {
                 if (response.status === 200) {
                     app.vue.locations = app.reindex_locations(response.data.locations);
@@ -153,7 +175,9 @@ let init_vue = (app) => {
     app.methods = {
         map_center: app.map_center,
         edit_loc: app.edit_loc,
-        move_marker_to_address: app.move_marker_to_address
+        move_marker_to_address: app.move_marker_to_address,
+        cancel_edit: app.cancel_edit,
+        save_edit: app.save_edit,
     };
 
     // This creates the Vue instance.
