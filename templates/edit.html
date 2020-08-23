@@ -15,6 +15,12 @@
           <div class="title is-size-4">Ballot Drop-Off Locations
             <button class="button is-light"><i class="fa fa-plus"></i></button>
           </div>
+          <div class="field">
+            <label class="checkbox">
+              <input type="checkbox" v-model="include_deleted">
+              Include deleted locations
+            </label>
+          </div>
           <table class="table is-narrow is-hoverable is-fullwidth location_list">
             <tbody>
               <tr v-for="loc in locations" @click="edit_loc(loc._idx)" :class="{'is-active': loc.is_active}">
@@ -69,13 +75,14 @@
               <p class="has-text-grey">Leave times blank if open all day</p>
             </div>
             <div class="field">
-              <label class="label">Deleted</label>
-              <input class="input" type="checkbox" v-model="eloc.is_deleted">
+              <label class="checkbox">
+                <input type="checkbox" v-model="eloc.is_deleted">
+              </label>
               Deleted
             </div>
             <div class="field is-grouped">
-              <p class="control"><button class="button is-success" @click="confirm"><span class="icon is-small"><i class="fa fa-thumbs-up"></i></span><span>Confirm: correct</span></button></p>
               <p class="control"><button class="button is-danger" @click="cancel_edit"><span class="icon is-small"><i class="fa fa-chevron-left"></i></span><span>Cancel</span></button></p>
+              <p class="control"><button class="button is-success" @click="confirm"><span class="icon is-small"><i class="fa fa-thumbs-up"></i></span><span>Correct</span></button></p>
               <p class="control"><button class="button is-info" @click="save_edit"><span class="icon is-small"><i class="fa fa-check"></i></span><span>Save</span></button></p>
             </div>
           </div>
@@ -94,10 +101,6 @@
         <!-- Map -->
         <div id="map"></div>
 
-        <div class="field">
-          <input class="input" type="checkbox" v-model="include_deleted">
-          Include deleted locations
-        </div>
       </div>
     </div>
 

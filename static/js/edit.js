@@ -74,6 +74,10 @@ let init_vue = (app) => {
         axios.post(callback_url, loc);
     };
 
+    app.confirm = function () {
+        // TODO
+    }
+
     app.reindex_locations = function (locations) {
         let idx = 0;
         for (let loc of locations) {
@@ -178,6 +182,7 @@ let init_vue = (app) => {
         move_marker_to_address: app.move_marker_to_address,
         cancel_edit: app.cancel_edit,
         save_edit: app.save_edit,
+        confirm: app.confirm,
     };
 
     // This creates the Vue instance.
