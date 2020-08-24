@@ -67,7 +67,6 @@ let init_vue = (app) => {
     };
 
     app.edit_loc = function (idx) {
-        console.log("Clicked on " + idx);
         let loc = app.vue.locations[idx];
         app.edited_idx = idx;
         app.hide_all_but_one_marker(idx);
@@ -82,7 +81,8 @@ let init_vue = (app) => {
     app.cancel_edit = function () {
         app.edited_idx = null;
         app.vue.mode = "browse";
-        app.show_markers();
+        app.remove_markers();
+        app.load_locations();
     };
 
     app.save_edit = function () {
@@ -101,8 +101,8 @@ let init_vue = (app) => {
         axios.post(callback_url, send_loc);
         // Resets the markers.
         app.remove_markers();
-        // Reindexes the locations, also to reflect deletion and markers.
-        app.vue.locations = app.reindex_locations(app.vue.locations);
+        // Reloads the locations, as one might have moved the map.
+        app.load_locations();
     };
 
     app.confirm = function () {
@@ -110,10 +110,9 @@ let init_vue = (app) => {
             {is_vote: true, id: app.vue.eloc.id});
         app.edited_idx = null;
         app.vue.mode = "browse";
-        app.show_markers();
+        app.remove_markers();
+        app.load_locations();
     }
-
-    app.deleted_icon = null;
 
     app.show_markers = function () {
         for (let loc of app.vue.locations) {
@@ -159,8 +158,7 @@ let init_vue = (app) => {
     };
 
     app.map_moved = function () {
-        // The map moved.  Stores the new location in local storage, and
-        // fetches the locations.
+        // The map moved.  Stores the new location in local storage.
         try {
             let c = app.map.getCenter();
             let z = app.map.getZoom();
@@ -170,7 +168,10 @@ let init_vue = (app) => {
                 zoom: z
             }));
         } catch (e) {}
-        app.load_locations();
+        // If we are browsing, loads the new locations.
+        if (app.vue.mode == "browse") {
+            app.load_locations();
+        }
     }
 
     app.toggle_deleted = function () {
