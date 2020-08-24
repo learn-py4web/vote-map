@@ -96,7 +96,7 @@
             </div>
             <div class="field">
               <label class="checkbox">
-                <input type="checkbox" v-model="eloc.is_deleted">
+                <input type="checkbox" @change="toggle_deleted" v-model="eloc.is_deleted">
               </label>
               Deleted
             </div>

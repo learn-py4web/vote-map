@@ -157,6 +157,21 @@ let init_vue = (app) => {
         app.load_locations();
     }
 
+    app.toggle_deleted = function () {
+        let loc = app.vue.locations[app.edited_idx];
+        let marker_options = {
+            position: {lat: loc.lat, lng: loc.lng},
+            map: app.map,
+            label: loc.label
+        };
+        if (app.vue.eloc.is_deleted) {
+            marker_options.icon = app.deleted_icon;
+        }
+        loc.marker.setMap();
+        loc.marker = new google.maps.Marker(marker_options);
+        loc.marker.setMap(map);
+    }
+
     app.reindex_locations = function (locations) {
         let idx = 0;
         for (let loc of locations) {
@@ -232,6 +247,7 @@ let init_vue = (app) => {
         save_edit: app.save_edit,
         confirm: app.confirm,
         load_locations: app.load_locations,
+        toggle_deleted: app.toggle_deleted,
     };
 
     // This creates the Vue instance.
@@ -259,7 +275,7 @@ let init_vue = (app) => {
         app.deleted_icon = {
             url: "images/purple-blank.png",
             size: new google.maps.Size(44, 44),
-            labelOrigin: new google.maps.Point(22, 12),
+            labelOrigin: new google.maps.Point(22, 14),
         };
 
     };
