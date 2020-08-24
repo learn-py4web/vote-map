@@ -36,7 +36,7 @@ let init_vue = (app) => {
             if (!app.vue.eloc) { return false; }
             try {
                 let loc = app.vue.locations[app.edited_idx];
-                for (p of app.fields) {
+                for (const p of app.fields) {
                     if (app.vue.eloc[p] !== loc[p]) {
                         return true;
                     }
@@ -76,7 +76,10 @@ let init_vue = (app) => {
         app.hide_all_but_one_marker(idx);
         app.vue.mode = "edit";
         // Loads the edit fields.
-        app.vue.eloc = {...loc};
+        app.vue.eloc = {};
+        for (const p of app.fields) {
+            Vue.set(app.vue.eloc, p, loc[p]);
+        }
     };
 
     app.cancel_edit = function () {
@@ -87,19 +90,27 @@ let init_vue = (app) => {
 
     app.save_edit = function () {
         let loc = app.vue.locations[app.edited_idx];
-        app.vue.eloc = {};
-        for (let p in app.vue.eloc) {
-            loc[p] = app.vue.eloc[p];
+        for (const p of app.fields) {
+            console.log("copying:", p);
+            Vue.set(loc, p, app.vue.eloc[p]);
         }
         console.log("New:", loc)
         app.edited_idx = null;
         app.vue.mode = "browse";
         app.show_markers();
-        axios.post(callback_url, loc);
+        let send_loc = {}
+        for (const p of app.fields) {
+            send_loc[p] = loc[p];
+        }
+        axios.post(callback_url, send_loc);
     };
 
     app.confirm = function () {
-        // TODO
+        axios.post(callback_url,
+            {is_vote: true, id: app.vue.eloc.id});
+        app.edited_idx = null;
+        app.vue.mode = "browse";
+        app.show_markers();
     }
 
     app.reindex_locations = function (locations) {
