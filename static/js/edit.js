@@ -111,25 +111,7 @@ let init_vue = (app) => {
         app.show_markers();
     }
 
-    app.reindex_locations = function (locations) {
-        let idx = 0;
-        for (let loc of locations) {
-            loc._idx = idx++;
-            loc.label = idx.toString();
-            loc.is_active = false;
-            loc.is_edited = false;
-            // Creates a marker for displaying the location.
-            loc.marker = new google.maps.Marker({
-                position: {lat: loc.lat, lng: loc.lng},
-                map: app.map,
-                label: loc.label
-            });
-            loc.marker.addListener('click', function () {
-                app.edit_loc(loc._idx);
-            });
-        }
-        return locations;
-    };
+    app.deleted_icon = null;
 
     app.show_markers = function () {
         for (let loc of app.vue.locations) {
@@ -175,6 +157,30 @@ let init_vue = (app) => {
         app.load_locations();
     }
 
+    app.reindex_locations = function (locations) {
+        let idx = 0;
+        for (let loc of locations) {
+            loc._idx = idx++;
+            loc.label = idx.toString();
+            loc.is_active = false;
+            loc.is_edited = false;
+            // Creates a marker for displaying the location.
+            let marker_options = {
+                position: {lat: loc.lat, lng: loc.lng},
+                map: app.map,
+                label: loc.label
+            };
+            if (loc.is_deleted) {
+                marker_options.icon = app.deleted_icon;
+            }
+            loc.marker = new google.maps.Marker(marker_options);
+            loc.marker.addListener('click', function () {
+                app.edit_loc(loc._idx);
+            });
+        }
+        return locations;
+    };
+
     app.load_locations = function () {
         // Gets the current bounds, and loads the locations.
         let bounds = app.map.getBounds();
@@ -187,6 +193,12 @@ let init_vue = (app) => {
                 include_deleted: app.vue.include_deleted,
             }}).then(function (response) {
                 if (response.status === 200) {
+                    // Removes the old markers.
+                    app.hide_markers();
+                    for (const loc of app.vue.locations) {
+                        loc.marker = null;
+                    }
+                    // Builds the new location list.
                     let all_locations = response.data.locations.concat(response.data.deleted_locations);
                     app.vue.locations = app.reindex_locations(all_locations);
                     app.fields = response.data.fields;
@@ -243,6 +255,13 @@ let init_vue = (app) => {
         // locations only on drag_end, to save on loads.
         map.addListener('bounds_changed', app.load_locations_once);
         map.addListener('dragend', app.map_moved);
+        // We cannot do this before, because 'google' is not defined.
+        app.deleted_icon = {
+            url: "images/purple-blank.png",
+            size: new google.maps.Size(44, 44),
+            labelOrigin: new google.maps.Point(22, 12),
+        };
+
     };
 
     // Call to the initializer.
