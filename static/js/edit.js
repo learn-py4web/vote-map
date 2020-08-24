@@ -14,11 +14,7 @@ let init_vue = (app) => {
     app.map = null; // The map
     app.initial_load = true; // To load locations initially only.
     app.edited_idx = null;
-    app.fields = [
-        'is_deleted', 'lat', 'lng', 'address_lat', 'address_lng',
-        'name', 'loc_type', 'type_other', 'date_open', 'date_close',
-        'time_open', 'time_close', 'address', 'rules'
-    ];
+    app.fields = [];
 
     // This is the Vue data.
     app.data = {
@@ -102,6 +98,7 @@ let init_vue = (app) => {
         for (const p of app.fields) {
             send_loc[p] = loc[p];
         }
+        send_loc.is_vote = false;
         axios.post(callback_url, send_loc);
     };
 
@@ -190,6 +187,7 @@ let init_vue = (app) => {
             }}).then(function (response) {
                 if (response.status === 200) {
                     app.vue.locations = app.reindex_locations(response.data.locations);
+                    app.fields = response.data.fields;
                 }
         });
     };

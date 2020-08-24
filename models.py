@@ -42,6 +42,13 @@ db.define_table(
     Field('date_updated', 'datetime', update=get_time),
 )
 
+# These are also given to the webapp.
+LOCATION_FIELDS = [
+    'id', 'is_deleted', 'lat', 'lng', 'address_lat', 'address_lng',
+    'name', 'loc_type', 'type_other', 'date_open', 'date_close',
+    'time_open', 'time_close', 'address', 'rules'
+]
+
 
 db.define_table(
     'location_history',

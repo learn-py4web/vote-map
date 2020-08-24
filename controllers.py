@@ -33,6 +33,7 @@ from py4web.utils.url_signer import URLSigner
 
 from yatl.helpers import A
 from . common import db, session, T, cache, auth, signed_url
+from . models import LOCATION_FIELDS, get_user_email
 from . settings_private import MAPS_API_KEY
 from .test_data import TEST_LOCATIONS
 from .constants import MAX_MAP_RESULTS
@@ -84,6 +85,7 @@ def edit_callback():
     return dict(
         locations=live_results + dead_results,
         may_be_incomplete=may_be_incomplete,
+        fields=LOCATION_FIELDS,
     )
 
 
@@ -91,27 +93,14 @@ def edit_callback():
 @action.uses(url_signer.verify())
 def post_edit():
     """Stores an edit, returning the ID if any."""
-    print(request.params)
-    d = {}
-    id = request.params.get('id')
-    if d.get('is_vote'):
+    id = request.json.get('id')
+    print(request.json)
+    if request.json.get('is_vote'):
         # This is a vote.
         register_vote(id)
         return "ok"
-    d['is_deleted'] = request.params.get('is_deleted')
-    d['lat'] = request.params.get('lat')
-    d['lng'] = request.params.get('lng')
-    d['address_lat'] = request.params.get('address_lat')
-    d['address_lng'] = request.params.get('address_lng')
-    d['name'] = request.params.get('name')
-    d['loc_type'] = request.params.get('loc_type')
-    d['type_other'] = request.params.get('type_other')
-    d['date_open'] = request.params.get('date_open')
-    d['date_close'] = request.params.get('date_close')
-    d['time_open'] = request.params.get('time_open')
-    d['time_close'] = request.params.get('time_close')
-    d['address'] = request.params.get('address')
-    d['rules'] = request.params.get('rules')
+    d = {p: request.json.get(p) for p in LOCATION_FIELDS}
+    print(d)
     new_id = perform_update(id, d)
     return dict(new_id=new_id)
 
@@ -119,12 +108,14 @@ def post_edit():
 def register_vote(id):
     """Registers a vote in favor of a location."""
     # Determines the location history id.
-    loc_hist = db(db.loaction_history.location_id == id).select(orderby=~db.location_history.timestamp).first()
+    loc_hist = db(db.location_history.location_id == id).select(orderby=~db.location_history.timestamp).first()
     if loc_hist is None:
         return
+    u = get_user_email()
     db.vote.update_or_insert(
-        (db.location_history_id == loc_hist.id),
-        location_history_id=loc_hist.id
+        ((db.vote.location_history_id == loc_hist.id) & (db.vote.author == u)),
+        location_history_id=loc_hist.id,
+        author=u,
     )
 
 
