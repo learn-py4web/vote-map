@@ -66,7 +66,43 @@ let init_vue = (app) => {
         }
     };
 
+    app.add_loc = function () {
+        // Adds a new location.
+        app.vue.mode = "edit";
+        app.hide_markers();
+        // Creates a new empty location.
+        let loc = {};
+        for (const p of app.fields) {
+            loc[p] = null;
+        }
+        loc.is_deleted = false;
+        // Copies it into eloc to allow editing.
+        app.vue.eloc = {};
+        for (const p of app.fields) {
+            Vue.set(app.vue.eloc, p, loc[p]);
+        }
+        // Puts a marker in the center.
+        let c = app.map.getCenter();
+        app.vue.eloc.lat = c.lat();
+        app.vue.eloc.lng = c.lng();
+        let marker_options = {
+            position: {lat: c.lat(), lng: c.lng()},
+            map: app.map,
+            draggable: true,
+        }
+        loc.marker = new google.maps.Marker(marker_options);
+        loc.marker.addListener('dragend', function () {
+            let l = loc.marker.getPosition();
+            app.vue.eloc.lat = l.lat();
+            app.vue.eloc.lng = l.lng();
+        });
+        // Adds the location.
+        app.edited_idx = app.vue.locations.length;
+        app.vue.locations.push(loc);
+    };
+
     app.edit_loc = function (idx) {
+        // Starts the edit of a location.
         let loc = app.vue.locations[idx];
         app.edited_idx = idx;
         app.hide_all_but_one_marker(idx);
@@ -277,6 +313,7 @@ let init_vue = (app) => {
     app.methods = {
         map_center: app.map_center,
         edit_loc: app.edit_loc,
+        add_loc: app.add_loc,
         move_marker_to_address: app.move_marker_to_address,
         cancel_edit: app.cancel_edit,
         save_edit: app.save_edit,

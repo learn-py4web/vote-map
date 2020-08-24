@@ -92,13 +92,13 @@ def edit_callback():
 def post_edit():
     """Stores an edit, returning the ID if any."""
     id = request.json.get('id')
-    print(request.json)
     if request.json.get('is_vote'):
         # This is a vote.
         register_vote(id)
         return "ok"
     d = {p: request.json.get(p) for p in LOCATION_FIELDS}
-    print(d)
+    # Sanitize.
+    d['is_deleted'] = bool(d.get('is_deleted', False))
     new_id = perform_update(id, d)
     return dict(new_id=new_id)
 

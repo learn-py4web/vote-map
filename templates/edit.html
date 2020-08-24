@@ -13,7 +13,7 @@
         <div v-if="mode === 'browse'">
           <!-- List of places -->
           <div class="title is-size-4">Ballot Drop-Off Locations
-            <button class="button is-light"><i class="fa fa-plus"></i></button>
+            <button @click="add_loc" class="button is-light"><i class="fa fa-plus"></i></button>
           </div>
           <div class="field">
             <label class="checkbox">
