@@ -114,9 +114,12 @@
 
         <!-- Map -->
         <div id="map"></div>
-        <div v-if="maybe_incomplete" class="has-text-grey-dark">
+        <div v-if="mode==='browse' && maybe_incomplete" class="has-text-grey-dark">
           The list of results may be incomplete; zoom in more
           to see them all.
+        </div>
+        <div v-if="mode==='edit'" class="has-text-grey-dark">
+          Drag the pointer to refine the location.
         </div>
       </div>
     </div>

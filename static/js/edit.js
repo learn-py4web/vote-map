@@ -76,6 +76,16 @@ let init_vue = (app) => {
         for (const p of app.fields) {
             Vue.set(app.vue.eloc, p, loc[p]);
         }
+        // Makes the marker draggable.
+        loc.marker.setDraggable(true);
+        // loc.marker.setAnimation(google.maps.Animation.BOUNCE);
+        loc.marker.setLabel(null);
+        loc.marker.addListener('dragend', function () {
+            let l = loc.marker.getPosition();
+            app.vue.eloc.lat = l.lat();
+            app.vue.eloc.lng = l.lng();
+        });
+
     };
 
     app.cancel_edit = function () {
@@ -179,7 +189,8 @@ let init_vue = (app) => {
         let marker_options = {
             position: {lat: loc.lat, lng: loc.lng},
             map: app.map,
-            label: loc.label
+            draggable: true,
+            // animation: google.maps.Animation.BOUNCE,
         };
         if (app.vue.eloc.is_deleted) {
             marker_options.icon = app.deleted_icon;
@@ -295,6 +306,7 @@ let init_vue = (app) => {
         // locations only on drag_end, to save on loads.
         map.addListener('bounds_changed', app.load_locations_once);
         map.addListener('dragend', app.map_moved);
+        map.addListener('zoom_changed', app.map_moved);
         // We cannot do this before, because 'google' is not defined.
         app.deleted_icon = {
             url: "images/purple-blank.png",
