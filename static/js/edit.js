@@ -14,6 +14,11 @@ let init_vue = (app) => {
     app.map = null; // The map
     app.initial_load = true; // To load locations initially only.
     app.edited_idx = null;
+    app.fields = [
+        'is_deleted', 'lat', 'lng', 'address_lat', 'address_lng',
+        'name', 'loc_type', 'type_other', 'date_open', 'date_close',
+        'time_open', 'time_close', 'address', 'rules'
+    ];
 
     // This is the Vue data.
     app.data = {
@@ -24,6 +29,24 @@ let init_vue = (app) => {
         // Fields.
         eloc: {},
     };
+
+    app.computed = {
+        is_modified: function () {
+            if (app.vue.mode === "browse") { return false; }
+            if (!app.vue.eloc) { return false; }
+            try {
+                let loc = app.vue.locations[app.edited_idx];
+                for (p of app.fields) {
+                    if (app.vue.eloc[p] !== loc[p]) {
+                        return true;
+                    }
+                }
+                return false;
+            } catch (e) {
+                return true;
+            }
+        }
+    }
 
     app.map_center = function (e) {
         if (e.keyCode === 13) {
@@ -64,6 +87,7 @@ let init_vue = (app) => {
 
     app.save_edit = function () {
         let loc = app.vue.locations[app.edited_idx];
+        app.vue.eloc = {};
         for (let p in app.vue.eloc) {
             loc[p] = app.vue.eloc[p];
         }
@@ -189,6 +213,7 @@ let init_vue = (app) => {
     app.vue = new Vue({
         el: "#vue-target",
         data: app.data,
+        computed: app.computed,
         methods: app.methods
     });
 
