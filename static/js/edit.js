@@ -88,19 +88,21 @@ let init_vue = (app) => {
     app.save_edit = function () {
         let loc = app.vue.locations[app.edited_idx];
         for (const p of app.fields) {
-            console.log("copying:", p);
             Vue.set(loc, p, app.vue.eloc[p]);
         }
-        console.log("New:", loc)
         app.edited_idx = null;
         app.vue.mode = "browse";
-        app.show_markers();
+        // Sends the edit.
         let send_loc = {}
         for (const p of app.fields) {
             send_loc[p] = loc[p];
         }
         send_loc.is_vote = false;
         axios.post(callback_url, send_loc);
+        // Resets the markers.
+        app.remove_markers();
+        // Reindexes the locations, also to reflect deletion and markers.
+        app.vue.locations = app.reindex_locations(app.vue.locations);
     };
 
     app.confirm = function () {
@@ -115,22 +117,36 @@ let init_vue = (app) => {
 
     app.show_markers = function () {
         for (let loc of app.vue.locations) {
-            loc.marker.setMap(app.map);
+            if (loc.marker) {
+                loc.marker.setMap(app.map);
+            }
         }
     };
 
     app.hide_markers = function () {
         for (let loc of app.vue.locations) {
-            loc.marker.setMap();
+            if (loc.marker) {
+                loc.marker.setMap();
+            }
         }
     };
 
+    app.remove_markers = function () {
+        // Removes the old markers.
+        app.hide_markers();
+        for (const loc of app.vue.locations) {
+            loc.marker = null;
+        }
+    }
+
     app.hide_all_but_one_marker = function (idx) {
         for (let i = 0; i < app.vue.locations.length; i++) {
-            if (i === idx) {
-                app.vue.locations[i].marker.setMap(app.map);
-            } else {
-                app.vue.locations[i].marker.setMap();
+            if (app.vue.locations[i].marker) {
+                if (i === idx) {
+                    app.vue.locations[i].marker.setMap(app.map);
+                } else {
+                    app.vue.locations[i].marker.setMap();
+                }
             }
         }
     };
@@ -174,26 +190,33 @@ let init_vue = (app) => {
 
     app.reindex_locations = function (locations) {
         let idx = 0;
+        let new_locations = [];
         for (let loc of locations) {
-            loc._idx = idx++;
-            loc.label = idx.toString();
-            loc.is_active = false;
-            loc.is_edited = false;
-            // Creates a marker for displaying the location.
-            let marker_options = {
-                position: {lat: loc.lat, lng: loc.lng},
-                map: app.map,
-                label: loc.label
-            };
-            if (loc.is_deleted) {
-                marker_options.icon = app.deleted_icon;
+            if (app.vue.include_deleted || !loc.is_deleted) {
+                loc._idx = idx++;
+                loc.label = idx.toString();
+                loc.is_active = false;
+                loc.is_edited = false;
+                // Creates a marker for displaying the location.
+                let marker_options = {
+                    position: {lat: loc.lat, lng: loc.lng},
+                    map: app.map,
+                    label: loc.label
+                };
+                loc.marker = null;
+                if (loc.is_deleted) {
+                    marker_options.icon = app.deleted_icon;
+                    loc.marker = new google.maps.Marker(marker_options);
+                } else {
+                    loc.marker = new google.maps.Marker(marker_options);
+                }
+                loc.marker.addListener('click', function () {
+                    app.edit_loc(loc._idx);
+                });
+            new_locations.push(loc);
             }
-            loc.marker = new google.maps.Marker(marker_options);
-            loc.marker.addListener('click', function () {
-                app.edit_loc(loc._idx);
-            });
         }
-        return locations;
+        return new_locations;
     };
 
     app.load_locations = function () {

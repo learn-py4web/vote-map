@@ -23,18 +23,12 @@
           </div>
           <div v-if="include_deleted" class="subtitle">Live locations</div>
           <table class="table is-narrow is-hoverable is-fullwidth location_list">
-            <tbody v-if="include_deleted">
+            <tbody>
               <tr v-for="loc in locations" @click="edit_loc(loc._idx)">
                 <template v-if="!loc.is_deleted">
                   <td class="location_label" >{{loc.label}}</td>
                   <td class="location_name">{{loc.name}}</td>
                 </template>
-              </tr>
-            </tbody>
-            <tbody v-else>
-              <tr v-for="loc in locations" @click="edit_loc(loc._idx)">
-                <td class="location_label" >{{loc.label}}</td>
-                <td class="location_name">{{loc.name}}</td>
               </tr>
             </tbody>
           </table>
