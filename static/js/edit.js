@@ -24,6 +24,7 @@ let init_vue = (app) => {
         include_deleted: false, // Include deleted locations when editing.
         // Fields.
         eloc: {},
+        maybe_incomplete: false, // Zoom in to see all data.
     };
 
     app.computed = {
@@ -186,8 +187,10 @@ let init_vue = (app) => {
                 include_deleted: app.vue.include_deleted,
             }}).then(function (response) {
                 if (response.status === 200) {
-                    app.vue.locations = app.reindex_locations(response.data.locations);
+                    let all_locations = response.data.locations.concat(response.data.deleted_locations);
+                    app.vue.locations = app.reindex_locations(all_locations);
                     app.fields = response.data.fields;
+                    app.vue.maybe_incomplete = response.data.maybe_incomplete;
                 }
         });
     };
@@ -216,6 +219,7 @@ let init_vue = (app) => {
         cancel_edit: app.cancel_edit,
         save_edit: app.save_edit,
         confirm: app.confirm,
+        load_locations: app.load_locations,
     };
 
     // This creates the Vue instance.

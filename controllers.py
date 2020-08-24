@@ -76,15 +76,15 @@ def edit_callback():
     qd = q & (db.location.is_deleted == False)
     may_be_incomplete = False
     live_results = db(ql).select(limitby=(0, MAX_MAP_RESULTS)).as_list()
-    dead_results = []
     if len(live_results) == MAX_MAP_RESULTS:
         may_be_incomplete = True
-    elif request.params.get('include_deleted'):
-        dead_results = db(qd).select(limitby=(0, MAX_MAP_RESULTS - len(live_results))).as_list()
-        may_be_incomplete = len(live_results) + len(dead_results) == MAX_MAP_RESULTS
+    dead_results = []
+    if request.params.get('include_deleted'):
+        dead_results = db(qd).select(limitby=(0, MAX_MAP_RESULTS)).as_list()
     return dict(
-        locations=live_results + dead_results,
-        may_be_incomplete=may_be_incomplete,
+        locations=live_results,
+        deleted_locations=dead_results,
+        maybe_incomplete=may_be_incomplete,
         fields=LOCATION_FIELDS,
     )
 

@@ -17,15 +17,35 @@
           </div>
           <div class="field">
             <label class="checkbox">
-              <input type="checkbox" v-model="include_deleted">
+              <input type="checkbox" v-model="include_deleted" @change="load_locations">
               Include deleted locations
             </label>
           </div>
+          <div v-if="include_deleted" class="subtitle">Live locations</div>
           <table class="table is-narrow is-hoverable is-fullwidth location_list">
-            <tbody>
-              <tr v-for="loc in locations" @click="edit_loc(loc._idx)" :class="{'is-active': loc.is_active}">
+            <tbody v-if="include_deleted">
+              <tr v-for="loc in locations" @click="edit_loc(loc._idx)">
+                <template v-if="!loc.is_deleted">
+                  <td class="location_label" >{{loc.label}}</td>
+                  <td class="location_name">{{loc.name}}</td>
+                </template>
+              </tr>
+            </tbody>
+            <tbody v-else>
+              <tr v-for="loc in locations" @click="edit_loc(loc._idx)">
                 <td class="location_label" >{{loc.label}}</td>
                 <td class="location_name">{{loc.name}}</td>
+              </tr>
+            </tbody>
+          </table>
+          <div v-if="include_deleted" class="subtitle">Deleted locations</div>
+          <table v-if="include_deleted" class="table is-narrow is-hoverable is-fullwidth location_list">
+            <tbody>
+              <tr v-for="loc in locations" @click="edit_loc(loc._idx)">
+                <template v-if="loc.is_deleted">
+                  <td class="location_label" >{{loc.label}}</td>
+                  <td class="location_name">{{loc.name}}</td>
+                </template>
               </tr>
             </tbody>
           </table>
@@ -100,7 +120,10 @@
 
         <!-- Map -->
         <div id="map"></div>
-
+        <div v-if="maybe_incomplete" class="has-text-grey-dark">
+          The list of results may be incomplete; zoom in more
+          to see them all.
+        </div>
       </div>
     </div>
 
