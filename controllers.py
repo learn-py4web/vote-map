@@ -63,7 +63,7 @@ def edit():
 
 
 @action('edit_callback', method='GET')
-@action.uses(url_signer.verify())
+@action.uses(db, session, url_signer.verify())
 def edit_callback():
     lat_max = float(request.params.get('lat_max'))
     lat_min = float(request.params.get('lat_min'))
@@ -72,25 +72,24 @@ def edit_callback():
     print(lat_min, lat_max, lng_min, lng_max)
     q = ((db.location.lat >= lat_min) & (db.location.lat <= lat_max) &
          (db.location.lng >= lng_min) & (db.location.lng <= lng_max))
-    ql = q & (db.location.is_deleted == True)
-    qd = q & (db.location.is_deleted == False)
+    ql = q & (db.location.is_deleted == False)
+    qd = q & (db.location.is_deleted == True)
     may_be_incomplete = False
     live_results = db(ql).select(limitby=(0, MAX_MAP_RESULTS)).as_list()
-    if len(live_results) == MAX_MAP_RESULTS:
-        may_be_incomplete = True
+    print(live_results)
     dead_results = []
-    if request.params.get('include_deleted'):
+    if request.params.get('include_deleted') == "true": 
         dead_results = db(qd).select(limitby=(0, MAX_MAP_RESULTS)).as_list()
     return dict(
         locations=live_results,
         deleted_locations=dead_results,
-        maybe_incomplete=may_be_incomplete,
+        maybe_incomplete=len(live_results) == MAX_MAP_RESULTS,
         fields=LOCATION_FIELDS,
     )
 
 
 @action('edit_callback', method='POST')
-@action.uses(url_signer.verify())
+@action.uses(db, session, url_signer.verify())
 def post_edit():
     """Stores an edit, returning the ID if any."""
     id = request.json.get('id')
