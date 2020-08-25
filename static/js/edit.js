@@ -21,6 +21,7 @@ let init_vue = (app) => {
 
     // This is the Vue data.
     app.data = {
+        loaded: false,
         search_text: "",
         locations: [],
         mode: "browse", // "browse" or "edit".
@@ -195,7 +196,7 @@ let init_vue = (app) => {
             }
         });
     };
-    
+
     app.show_markers = function () {
         for (let loc of app.vue.locations) {
             if (loc.marker) {
@@ -326,6 +327,7 @@ let init_vue = (app) => {
                     app.vue.locations = app.reindex_locations(all_locations);
                     app.fields = response.data.fields;
                     app.vue.maybe_incomplete = response.data.maybe_incomplete;
+                    app.vue.loaded = true;
                 }
         });
     };

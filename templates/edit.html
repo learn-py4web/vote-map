@@ -21,6 +21,9 @@
               Show deleted locations
             </label>
           </div>
+          <div v-if="loaded && locations.length === 0">
+            No locations in map area.
+          </div>
           <div v-if="include_deleted" class="subtitle">Live locations</div>
           <table class="table is-narrow is-hoverable is-fullwidth location_list">
             <tbody>
