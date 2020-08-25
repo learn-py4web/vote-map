@@ -15,6 +15,8 @@ let init_vue = (app) => {
     app.initial_load = true; // To load locations initially only.
     app.edited_idx = null;
     app.fields = [];
+    app.mz = 0;
+    app.ts = null;
 
     // This is the Vue data.
     app.data = {
@@ -66,9 +68,16 @@ let init_vue = (app) => {
         }
     };
 
+    app.start_edit = function () {
+        // Starts editing.
+        app.vue.mode = "edit";
+        app.mz = app.map.getZoom();
+        app.ts = new Date();
+    }
+
     app.add_loc = function () {
         // Adds a new location.
-        app.vue.mode = "edit";
+        app.start_edit();
         app.hide_markers();
         // Creates a new empty location.
         let loc = {};
@@ -102,11 +111,11 @@ let init_vue = (app) => {
     };
 
     app.edit_loc = function (idx) {
+        app.start_edit();
         // Starts the edit of a location.
         let loc = app.vue.locations[idx];
         app.edited_idx = idx;
         app.hide_all_but_one_marker(idx);
-        app.vue.mode = "edit";
         // Loads the edit fields.
         app.vue.eloc = {};
         for (const p of app.fields) {
@@ -144,7 +153,12 @@ let init_vue = (app) => {
             send_loc[p] = loc[p];
         }
         send_loc.is_vote = false;
-        axios.post(callback_url, send_loc);
+        axios.post(callback_url, {
+            is_vote: false,
+            loc: send_loc,
+            dt: new Date() - app.ts,
+            mz: app.mz}
+        );
         // Resets the markers.
         app.remove_markers();
         // Reloads the locations, as one might have moved the map.
@@ -153,7 +167,7 @@ let init_vue = (app) => {
 
     app.confirm = function () {
         axios.post(callback_url,
-            {is_vote: true, id: app.vue.eloc.id});
+            {is_vote: true, id: app.vue.eloc.id, mz: app.mz});
         app.edited_idx = null;
         app.vue.mode = "browse";
         app.remove_markers();
@@ -208,6 +222,7 @@ let init_vue = (app) => {
         try {
             let c = app.map.getCenter();
             let z = app.map.getZoom();
+            app.mz = Math.max(app.mz, z);
             window.localStorage.setItem("latlong", JSON.stringify({
                 lat: c.lat(),
                 lng: c.lng(),
@@ -215,7 +230,7 @@ let init_vue = (app) => {
             }));
         } catch (e) {}
         // If we are browsing, loads the new locations.
-        if (app.vue.mode == "browse") {
+        if (app.vue.mode === "browse") {
             app.load_locations();
         }
     }
@@ -292,17 +307,6 @@ let init_vue = (app) => {
                 }
         });
     };
-
-    app.display_locations = function () {
-        // Displays all locations.
-        for (let loc of app.vue.locations) {
-            app.display_location(loc);
-        }
-    };
-
-    app.display_location = function (loc) {
-        // displays location loc on the map.
-    }
 
     app.move_marker_to_address = function () {
         // TODO

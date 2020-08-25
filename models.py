@@ -67,6 +67,8 @@ db.define_table(
     Field('time_open', 'time'),
     Field('time_close', 'time'),
     Field('address'),
+    Field('max_zoom', 'integer'), # Max zoom level used in edit.
+    Field('edit_time', 'integer'), # How long did the edit last.
     Field('rules', 'text'),
     Field('timestamp', 'datetime', default=get_time),
 )
@@ -77,6 +79,7 @@ db.define_table(
     Field('location_history_id', 'reference location_history'),
     Field('author', default=get_user_email),
     Field('timestamp', 'datetime', default=get_time),
+    Field('max_zoom', 'integer'), # Max zoom level used to confirm.
 )
 
 

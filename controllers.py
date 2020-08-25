@@ -69,7 +69,6 @@ def edit_callback():
     lat_min = float(request.params.get('lat_min'))
     lng_max = float(request.params.get('lng_max'))
     lng_min = float(request.params.get('lng_min'))
-    print(lat_min, lat_max, lng_min, lng_max)
     q = ((db.location.lat >= lat_min) & (db.location.lat <= lat_max) &
          (db.location.lng >= lng_min) & (db.location.lng <= lng_max))
     ql = q & (db.location.is_deleted == False)
@@ -91,19 +90,26 @@ def edit_callback():
 @action.uses(db, session, url_signer.verify())
 def post_edit():
     """Stores an edit, returning the ID if any."""
-    id = request.json.get('id')
     if request.json.get('is_vote'):
         # This is a vote.
-        register_vote(id)
+        id = request.json.get('id')
+        mz = request.json.get('mz')
+        register_vote(id, max_zoom=mz)
         return "ok"
-    d = {p: request.json.get(p) for p in LOCATION_FIELDS}
+    loc = request.json.get('loc')
+    id = loc.get('id')
+    if loc is None:
+        return "nok"
+    d = {p: loc.get(p) for p in LOCATION_FIELDS}
+    max_zoom = request.json.get('mz')
+    edit_time = request.json.get('dt');
     # Sanitize.
     d['is_deleted'] = bool(d.get('is_deleted', False))
-    new_id = perform_update(id, d)
+    new_id = perform_update(id, d, max_zoom=max_zoom, edit_time=edit_time)
     return dict(new_id=new_id)
 
 
-def register_vote(id):
+def register_vote(id, max_zoom=None):
     """Registers a vote in favor of a location."""
     # Determines the location history id.
     loc_hist = db(db.location_history.location_id == id).select(orderby=~db.location_history.timestamp).first()
@@ -114,10 +120,11 @@ def register_vote(id):
         ((db.vote.location_history_id == loc_hist.id) & (db.vote.author == u)),
         location_history_id=loc_hist.id,
         author=u,
+        max_zoom=max_zoom,
     )
 
 
-def perform_update(id, d):
+def perform_update(id, d, max_zoom=None, edit_time=None):
     """Performs the update corresponding to dictionary d, noting the
     outcome in the location history."""
     if id is not None:
@@ -132,7 +139,7 @@ def perform_update(id, d):
         new_id = db.location.insert(**d)
         d['location_id'] = new_id
     # Updates the history.
-    db.location_history.insert(**d)
+    db.location_history.insert(max_zoom=max_zoom, edit_time=edit_time, **d)
     return new_id
 
 
