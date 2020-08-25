@@ -36,10 +36,11 @@ from . common import db, session, T, cache, auth, signed_url
 from . models import LOCATION_FIELDS, get_user_email
 from . settings_private import MAPS_API_KEY
 from .test_data import TEST_LOCATIONS
-from .constants import MAX_MAP_RESULTS
-from .util import cleanup
+from .constants import MAX_MAP_RESULTS, MAX_VIEW_RESULTS, ZIPCODE_LOCATIONS
+from .util import cleanup, lat_long_to_square10
 
 url_signer = URLSigner(session)
+
 
 @action('index')
 @action.uses('index.html', url_signer)
@@ -47,9 +48,50 @@ def index():
     return dict(
         # This is an example of a signed URL for the callback.
         # See the index.html template for how this is passed to the javascript.
-        callback_url = URL('callback', signer=url_signer),
+        get_locations = URL('get_locations', signer=url_signer),
         MAPS_API_KEY = MAPS_API_KEY
     )
+
+
+@action('get_locations')
+@action.uses(db, session, url_signer.verify())
+def get_locations():
+    loc_specified = False
+    zipcode = request.params.get('zipcode')
+    if zipcode is not None:
+        # Tries via zipcode.
+        r = ZIPCODE_LOCATIONS.get(zipcode)
+        if r is not None:
+            lat, lng = r
+            loc_specified = True
+    if not loc_specified:
+        appengine_loc = request.get_header("X-Appengine-CityLatLong")
+        if appengine_loc is not None:
+            locs = appengine_loc.split(",")
+            lat, lng = float(locs[0]), float(locs[1])
+        else:
+            return dict(
+                locations=[],
+                loc_specified=False,
+            )
+    # Gets many locations from center.
+    all_results = []
+    for d in [0.05, 0.1, 0.2, 0.4, 0.8, 1.6]:
+        lat_min, lat_max = lat - d, lat + d
+        lng_min, lng_max = lng - d, lng + d
+        q = ((db.location.lat >= lat_min) & (db.location.lat <= lat_max) &
+             (db.location.lng >= lng_min) & (db.location.lng <= lng_max))
+        q &= (db.location.is_deleted == False)
+        r = db(q).select(limitby=(0, MAX_VIEW_RESULTS)).as_list()
+        all_results.extend(r)
+        if len(r) >= MAX_VIEW_RESULTS:
+            break
+    # Need to sort the results.
+    return dict(
+        locations=all_results,
+        loc_specified=loc_specified,
+    )
+
 
 @action('edit')
 @action.uses('edit.html', url_signer, auth.user)
@@ -127,15 +169,16 @@ def register_vote(id, max_zoom=None):
 def perform_update(id, d, max_zoom=None, edit_time=None):
     """Performs the update corresponding to dictionary d, noting the
     outcome in the location history."""
+    # Computes the square10.
+    d['square10'] = lat_long_to_square10(d.get('lat', 0), d.get('lng', 0))
+    cleanup(d, ['id', 'author', 'date_created', 'date_updated'])
     if id is not None:
         # Update.
-        cleanup(d, ['id', 'author'])
         db(db.location.id == id).update(**d)
         d['location_id'] = id
         new_id = None
     else:
         # Insert.
-        cleanup(d, ['id', 'author'])
         new_id = db.location.insert(**d)
         d['location_id'] = new_id
     # Updates the history.
@@ -161,6 +204,9 @@ def cleardb():
     db(db.location).delete()
     db(db.location_history).delete()
     db(db.vote).delete()
+
+
+
 
 ###############################################
 # Old below

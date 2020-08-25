@@ -1,12 +1,9 @@
 [[extend 'layout.html']]
 
 [[block page_head]]
-<link rel="stylesheet" href="css/embedmap.css">
+<link rel="stylesheet" href="css/index.css">
 [[end]]
 
-<!--
-See https://developers.google.com/maps/documentation/urls/get-started
--->
 
 <section class="section">
 
@@ -38,5 +35,5 @@ See https://developers.google.com/maps/documentation/urls/get-started
   let maps_api_key = "[[=XML(MAPS_API_KEY)]]";
   let callback_url = "[[=XML(callback_url)]]";
 </script>
-<script src="js/embedmap.js"></script>
+<script src="js/index.js"></script>
 [[end]]

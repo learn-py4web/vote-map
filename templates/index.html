@@ -1,14 +1,89 @@
 [[extend 'layout.html']]
 
 [[block page_head]]
-<link rel="stylesheet" href="css/map.css">
+<link rel="stylesheet" href="css/embedmap.css">
 [[end]]
+
+<!--
+See https://developers.google.com/maps/documentation/urls/get-started
+-->
 
 <section class="section">
 
-  <div id="map"></div>
-
   <div id="vue-target">
+
+    <div class="columns">
+      <div class="column is-one-third">
+
+        <!-- zip code -->
+        <div class="field">
+          <div class="control has-icons-right">
+            <input class="input" placeholder="Your zip code" v-model="zipcode">
+            <span class="icon is-small is-right"><i class="fa fa-search"></i></span>
+          </div>
+        </div>
+
+        <!-- Place list -->
+        <h1 class="title">Ballot return places</h1>
+        <div v-if="locations.length=0">
+          Enter a zip code to search the database of places where ballots can be returned.
+        </div>
+        <div v-else>
+          <div v-if="!loc_specified">
+            The list is for a location that has been guessed from your IP address.
+            Enter a zip code to search the database of places where ballots can be returned.
+          </div>
+          <ul>
+            <li v-for="p in places"><a @click="goto(p._idx)">{{p.name}}</a>
+          </ul>
+          <p class="has-text-grey">Click on a result to display it on a map.</p>
+        </div>
+      </div>
+
+      <div class="column">
+        <iframe width="100%" style="height:450px !important" height="450" frameborder="0" style="border:0"
+                :src="mapsurl" allowfullscreen></iframe>
+
+        <!-- Details -->
+        <div v-if="eloc">
+          <div class="field">
+            <label for="name" class="label">Name</label>
+            <input class="input is-static" placeholder="Location name" v-model="eloc.name" readonly>
+          </div>
+          <div class="field">
+            <label class="label">Address</label>
+            <textarea class="textarea" v-model="eloc.address" rows="3" readonly></textarea>
+          </div>
+          <div class="field">
+            <label for="loc_type" class="label">Location type</label>
+            <input v-if="eloc.loc_type !== 'Other'" class="input is-static" v-model="eloc.loc_type">
+            <input v-else class="input is-static" v-model="eloc.type_other">
+          </div>
+          <div class="field">
+            <label class="label">Rules</label>
+            <textarea class="textarea" v-model="eloc.rules" rows="2" readonly></textarea>
+          </div>
+          <div class="field">
+            <label class="label">Open from date</label>
+            <input class="input is-static" type="date" v-model="eloc.date_open" readonly>
+          </div>
+          <div class="field">
+            <label class="label">Closing on date</label>
+            <input class="input is-static" type="date" v-model="eloc.date_close" readonly>
+          </div>
+          <div class="field">
+            <label class="label">Daily opening time</label>
+            <input class="input is-static" type="time" v-model="eloc.time_open" readonly>
+          </div>
+          <div class="field">
+            <label class="label">Daily closing time</label>
+            <input class="input is-static" type="time" v-model="eloc.time_close" readonly>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
 
   </div>
 
@@ -17,9 +92,8 @@
 [[block page_scripts]]
 <!-- Loads the index-specific js for Vue -->
 <script>
+  let maps_api_key = "[[=XML(MAPS_API_KEY)]]";
   let callback_url = "[[=XML(callback_url)]]";
 </script>
-<script src="js/index.js"></script>
-<script async defer src="https://maps.googleapis.com/maps/api/js?key=[[=MAPS_API_KEY]]&callback=initMap"
-  type="text/javascript"></script>
+<script src="js/embedmap.js"></script>
 [[end]]
