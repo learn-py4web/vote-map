@@ -17,6 +17,7 @@ let init_vue = (app) => {
     app.fields = [];
     app.mz = 0;
     app.ts = null;
+    app.geolocation_url = "https://maps.googleapis.com/maps/api/geocode/json?";
 
     // This is the Vue data.
     app.data = {
@@ -49,8 +50,7 @@ let init_vue = (app) => {
 
     app.map_center = function (e) {
         if (e.keyCode === 13) {
-            let requrl = "https://maps.googleapis.com/maps/api/geocode/json?";
-            requrl += "key=" + maps_api_key;
+            let requrl = app.geolocation_url + "key=" + maps_api_key;
             requrl += "&address=" + encodeURIComponent(app.vue.search_text);
             console.log(requrl);
             axios.get(requrl).then(function (response) {
@@ -174,6 +174,28 @@ let init_vue = (app) => {
         app.load_locations();
     }
 
+    app.move_marker_to_address = function () {
+        let loc = app.vue.locations[app.edited_idx];
+        let requrl = app.geolocation_url + "key=" + maps_api_key;
+        requrl += "&address=" + encodeURIComponent(app.vue.eloc.address);
+        axios.get(requrl).then(function (response) {
+            if (response.status === 200 && response.data.status === "OK") {
+                if (response.data.results.length > 0) {
+                    let first_result = response.data.results[0];
+                    let lat = first_result.geometry.location.lat;
+                    let lng = first_result.geometry.location.lng;
+                    // Centers the map.
+                    app.map.setCenter({lat: lat, lng: lng});
+                    // Stores the position.
+                    app.vue.eloc.lat = lat;
+                    app.vue.eloc.lng = lng;
+                    // Moves the marker.
+                    loc.marker.setPosition({lat: lat, lng: lng});
+                }
+            }
+        });
+    };
+    
     app.show_markers = function () {
         for (let loc of app.vue.locations) {
             if (loc.marker) {
@@ -307,10 +329,6 @@ let init_vue = (app) => {
                 }
         });
     };
-
-    app.move_marker_to_address = function () {
-        // TODO
-    }
 
     // We form the dictionary of all methods, so we can assign them
     // to the Vue app in a single blow.
