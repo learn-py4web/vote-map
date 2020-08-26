@@ -36,8 +36,8 @@ from . common import db, session, T, cache, auth, signed_url
 from . models import LOCATION_FIELDS, get_user_email
 from . settings_private import MAPS_API_KEY
 from .test_data import TEST_LOCATIONS
-from .constants import MAX_MAP_RESULTS, MAX_VIEW_RESULTS, ZIPCODE_LOCATIONS
-from .util import cleanup, lat_long_to_square10
+from .constants import *
+from .util import cleanup, latlng_to_square10
 
 url_signer = URLSigner(session)
 
@@ -114,11 +114,29 @@ def edit_callback():
     lat_min = float(request.params.get('lat_min'))
     lng_max = float(request.params.get('lng_max'))
     lng_min = float(request.params.get('lng_min'))
+    # Check on size.
+    if lat_max - lat_min > DMAX or lng_max - lng_min > DMAX:
+        # Please zoom in.
+        return dict(
+            locations = [], deleted_locations = [],
+            maybe_incomplete = True,
+            fields=LOCATION_FIELDS
+        )
+    # Gets the squares.
+    squares = {latlng_to_square10(y, x) for (x, y) in
+               [(lat_max, lng_max), (lat_max, lng_min),
+                (lat_min, lng_max), (lat_min, lng_min)]}
+    if len(squares) > 1:
+        # We need to be more sophisticated.
+        squares.union(squares_for_area(lat_max, lat_min, lng_max, lng_min))
+    live_results = {}
+    for sq in squares:
+        live_results.update
+    # Gets the results.
     q = ((db.location.lat >= lat_min) & (db.location.lat <= lat_max) &
          (db.location.lng >= lng_min) & (db.location.lng <= lng_max))
     ql = q & (db.location.is_deleted == False)
     qd = q & (db.location.is_deleted == True)
-    may_be_incomplete = False
     live_results = db(ql).select(limitby=(0, MAX_MAP_RESULTS)).as_list()
     dead_results = []
     if request.params.get('include_deleted') == "true":
@@ -177,7 +195,7 @@ def perform_update(id, d, max_zoom=None, edit_time=None):
     """Performs the update corresponding to dictionary d, noting the
     outcome in the location history."""
     # Computes the square10.
-    d['square10'] = lat_long_to_square10(d.get('lat', 0), d.get('lng', 0))
+    d['square10'] = latlng_to_square10(d.get('lat', 0), d.get('lng', 0))
     cleanup(d, ['id', 'author', 'date_created', 'date_updated'])
     if id is not None:
         # Update.
