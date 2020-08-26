@@ -73,6 +73,11 @@ def info():
     return dict()
 
 
+@action('privacy')
+@action.uses(auth, 'privacy.html')
+def info():
+    return dict()
+
 ### API
 
 
