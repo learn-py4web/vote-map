@@ -64,29 +64,29 @@ See https://developers.google.com/maps/documentation/urls/get-started
             <textarea class="textarea" v-model="eloc.address" rows="3" readonly></textarea>
           </div>
           <div class="field">
-            <label for="loc_type" class="label">Location type</label>
-            <input v-if="eloc.loc_type !== 'Other'" class="input is-static" v-model="eloc.loc_type">
-            <input v-else class="input is-static" v-model="eloc.type_other">
+            <label class="label">Location type</label>
+            <p v-if="eloc.loc_type === 'Other'">{{eloc.type_other}}</p>
+            <p v-else>{{eloc.type_other}}</p>
           </div>
           <div class="field">
             <label class="label">Rules</label>
             <textarea class="textarea" v-model="eloc.rules" rows="2" readonly></textarea>
           </div>
-          <div class="field">
+          <div v-if="eloc.date_open" class="field">
             <label class="label">Open from date</label>
-            <input class="input is-static" type="date" v-model="eloc.date_open" readonly>
+            {{eloc.date_open}}
           </div>
-          <div class="field">
+          <div v-if="eloc.date_close" class="field">
             <label class="label">Closing on date</label>
-            <input class="input is-static" type="date" v-model="eloc.date_close" readonly>
+            {{eloc.date_close}}
           </div>
-          <div class="field">
+          <div v-if="eloc.time_open" class="field">
             <label class="label">Daily opening time</label>
-            <input class="input is-static" type="time" v-model="eloc.time_open" readonly>
+            {{eloc.time_open}}
           </div>
-          <div class="field">
+          <div v-if="eloc.time_close" class="field">
             <label class="label">Daily closing time</label>
-            <input class="input is-static" type="time" v-model="eloc.time_close" readonly>
+            {{eloc.time_close}}
           </div>
         </div>
 

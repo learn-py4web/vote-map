@@ -29,7 +29,6 @@ let init = (app) => {
 
     app.goto = function (idx) {
         // Shows the details.
-        // app.vue.eloc = app.vue.locations[idx];
         let loc = app.vue.locations[idx];
         app.vue.eloc = loc;
         // Loads the map.
@@ -39,16 +38,16 @@ let init = (app) => {
 
     app.lookup_zip = function (e) {
         if (e.keyCode === 13) {
-            app.load_locations();
+            app.load_locations(true);
         }
     };
 
-    app.load_locations = function () {
+    app.load_locations = function (search_happened) {
         app.vue.eloc = null; // Clears old details.
         axios.get(get_locations_url, {
             params: {zipcode: app.vue.zipcode}
         }).then(function (response) {
-            app.vue.search_happened = true;
+            app.vue.search_happened = search_happened;
             app.vue.locations = app.enumerate(response.data.locations);
             app.vue.loc_specified = response.data.loc_specified;
             app.fields = response.data.fields;
@@ -71,7 +70,7 @@ let init = (app) => {
 
     // And this initializes it.
     app.init = () => {
-        app.load_locations();
+        app.load_locations(false);
     };
 
     // Call to the initializer.
