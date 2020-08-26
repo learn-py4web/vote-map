@@ -24,7 +24,6 @@ def get_time():
 db.define_table(
     'location',
     Field('is_deleted', 'boolean', default=False),
-    Field('author', default=get_user_email),
     Field('lat', 'double'),
     Field('lng', 'double'),
     Field('address_lat', 'double'),
