@@ -1,7 +1,7 @@
 [[extend 'layout.html']]
 
 [[block page_head]]
-<link rel="stylesheet" href="css/embedmap.css">
+<link rel="stylesheet" href="css/index.css">
 [[end]]
 
 <!--
@@ -15,28 +15,37 @@ See https://developers.google.com/maps/documentation/urls/get-started
     <div class="columns">
       <div class="column is-one-third">
 
+        <h1 class="title">Search ballot return locations</h1>
+
         <!-- zip code -->
         <div class="field">
+          <label class="label">Zip code</label>
           <div class="control has-icons-right">
-            <input class="input" placeholder="Your zip code" v-model="zipcode">
+            <input class="input" placeholder="Your zip code" @keydown="lookup_zip" v-model="zipcode">
             <span class="icon is-small is-right"><i class="fa fa-search"></i></span>
           </div>
         </div>
 
         <!-- Place list -->
-        <h1 class="title">Ballot return places</h1>
-        <div v-if="locations.length=0">
-          Enter a zip code to search the database of places where ballots can be returned.
+        <div v-if="locations.length === 0 && search_happened">
+          No locations found.
+        </div>
+        <div v-if="locations.length === 0" class="mt-5">
+          Enter a zip code to search the database of locations where ballots can be returned.
         </div>
         <div v-else>
-          <div v-if="!loc_specified">
-            The list is for a location that has been guessed from your IP address.
-            Enter a zip code to search the database of places where ballots can be returned.
+          <div class="subtitle">Locations:</div>
+          <div v-if="!loc_specified && locations.length > 0">
+            Your location has been guessed on the basis of your IP address.
           </div>
-          <ul>
-            <li v-for="p in places"><a @click="goto(p._idx)">{{p.name}}</a>
-          </ul>
-          <p class="has-text-grey">Click on a result to display it on a map.</p>
+          <table class="table is-narrow is-hoverable is-fullwidth location_list">
+            <tbody>
+            <tr v-for="loc in locations" @click="goto(loc._idx)">
+              <td>{{loc.name}}</td>
+            </tr>
+            </tbody>
+          </table>
+          <p v-if="locations.length > 0" class="has-text-grey">Click on a result to display it on a map.</p>
         </div>
       </div>
 
@@ -93,7 +102,7 @@ See https://developers.google.com/maps/documentation/urls/get-started
 <!-- Loads the index-specific js for Vue -->
 <script>
   let maps_api_key = "[[=XML(MAPS_API_KEY)]]";
-  let callback_url = "[[=XML(callback_url)]]";
+  let get_locations_url = "[[=XML(get_locations_url)]]";
 </script>
-<script src="js/embedmap.js"></script>
+<script src="js/index.js"></script>
 [[end]]

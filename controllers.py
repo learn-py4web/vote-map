@@ -48,7 +48,7 @@ def index():
     return dict(
         # This is an example of a signed URL for the callback.
         # See the index.html template for how this is passed to the javascript.
-        get_locations = URL('get_locations', signer=url_signer),
+        get_locations_url = URL('get_locations', signer=url_signer),
         MAPS_API_KEY = MAPS_API_KEY
     )
 
@@ -63,6 +63,7 @@ def get_locations():
         r = ZIPCODE_LOCATIONS.get(zipcode)
         if r is not None:
             lat, lng = r
+            print("Found:", lat, lng)
             loc_specified = True
     if not loc_specified:
         appengine_loc = request.get_header("X-Appengine-CityLatLong")
@@ -75,7 +76,7 @@ def get_locations():
                 loc_specified=False,
             )
     # Gets many locations from center.
-    all_results = []
+    all_results = {} # id to record, for uniqueness.
     for d in [0.05, 0.1, 0.2, 0.4, 0.8, 1.6]:
         lat_min, lat_max = lat - d, lat + d
         lng_min, lng_max = lng - d, lng + d
@@ -83,13 +84,15 @@ def get_locations():
              (db.location.lng >= lng_min) & (db.location.lng <= lng_max))
         q &= (db.location.is_deleted == False)
         r = db(q).select(limitby=(0, MAX_VIEW_RESULTS)).as_list()
-        all_results.extend(r)
-        if len(r) >= MAX_VIEW_RESULTS:
+        all_results.update({rec['id']: cleanup(rec, ["square10", "author", "date_created", "date_updated"]) for rec in r})
+        print ("For", d, "found", len(all_results), "results.")
+        if len(all_results) >= MAX_VIEW_RESULTS:
             break
     # Need to sort the results.
     return dict(
-        locations=all_results,
+        locations=list(all_results.values()),
         loc_specified=loc_specified,
+        fields=LOCATION_FIELDS,
     )
 
 
@@ -120,6 +123,8 @@ def edit_callback():
     dead_results = []
     if request.params.get('include_deleted') == "true":
         dead_results = db(qd).select(limitby=(0, MAX_MAP_RESULTS)).as_list()
+    # Remembers which results the user has requested.
+    session['requested_ids'] = [x['id'] for x in live_results] + [x['id'] for x in dead_results]
     return dict(
         locations=live_results,
         deleted_locations=dead_results,
@@ -136,12 +141,14 @@ def post_edit():
         # This is a vote.
         id = request.json.get('id')
         mz = request.json.get('mz')
-        register_vote(id, max_zoom=mz)
+        # As a safety measure, we only accept edits for results the user has obtained.
+        if id in session.get('requested_ids', []):
+            register_vote(id, max_zoom=mz)
         return "ok"
     loc = request.json.get('loc')
     id = loc.get('id')
-    if loc is None:
-        return "nok"
+    if loc is None or id not in session.get('requested_ids', []):
+        return "ok" # Silent discard.
     d = {p: loc.get(p) for p in LOCATION_FIELDS}
     max_zoom = request.json.get('mz')
     edit_time = request.json.get('dt');
@@ -190,21 +197,21 @@ def perform_update(id, d, max_zoom=None, edit_time=None):
 
 # TODO: remove this testing code.
 
-@action('initdb')
-@action.uses(auth.user)
-def initdb():
-    cleardb()
-    for d in TEST_LOCATIONS:
-        perform_update(None, d)
-    return "ok"
-
-@action('cleardb')
-@action.uses(auth.user)
-def cleardb():
-    db(db.location).delete()
-    db(db.location_history).delete()
-    db(db.vote).delete()
-
+# @action('initdb')
+# @action.uses(auth.user)
+# def initdb():
+#     cleardb()
+#     for d in TEST_LOCATIONS:
+#         perform_update(None, d)
+#     return "ok"
+#
+# @action('cleardb')
+# @action.uses(auth.user)
+# def cleardb():
+#     db(db.location).delete()
+#     db(db.location_history).delete()
+#     db(db.vote).delete()
+#
 
 
 
