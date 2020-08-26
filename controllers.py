@@ -37,7 +37,7 @@ from . models import LOCATION_FIELDS, get_user_email
 from . settings_private import MAPS_API_KEY
 from .test_data import TEST_LOCATIONS
 from .constants import *
-from .util import cleanup, latlng_to_square10
+from .util import cleanup, latlng_to_square10, get_results_in_region
 
 url_signer = URLSigner(session)
 
@@ -114,39 +114,20 @@ def edit_callback():
     lat_min = float(request.params.get('lat_min'))
     lng_max = float(request.params.get('lng_max'))
     lng_min = float(request.params.get('lng_min'))
-    # Check on size.
-    if lat_max - lat_min > DMAX or lng_max - lng_min > DMAX:
-        # Please zoom in.
-        return dict(
-            locations = [], deleted_locations = [],
-            maybe_incomplete = True,
-            fields=LOCATION_FIELDS
-        )
-    # Gets the squares.
-    squares = {latlng_to_square10(y, x) for (x, y) in
-               [(lat_max, lng_max), (lat_max, lng_min),
-                (lat_min, lng_max), (lat_min, lng_min)]}
-    if len(squares) > 1:
-        # We need to be more sophisticated.
-        squares.union(squares_for_area(lat_max, lat_min, lng_max, lng_min))
-    live_results = {}
-    for sq in squares:
-        live_results.update
-    # Gets the results.
-    q = ((db.location.lat >= lat_min) & (db.location.lat <= lat_max) &
-         (db.location.lng >= lng_min) & (db.location.lng <= lng_max))
-    ql = q & (db.location.is_deleted == False)
-    qd = q & (db.location.is_deleted == True)
-    live_results = db(ql).select(limitby=(0, MAX_MAP_RESULTS)).as_list()
+    live_results, maybe_incomplete = get_results_in_region(
+        db, lat_max, lat_min, lng_max, lng_min, is_deleted=False,
+        max_results=MAX_MAP_RESULTS)
     dead_results = []
     if request.params.get('include_deleted') == "true":
-        dead_results = db(qd).select(limitby=(0, MAX_MAP_RESULTS)).as_list()
+        dead_results, _ = get_results_in_region(
+            db, lat_max, lat_min, lng_max, lng_min, is_deleted=False,
+            max_results=MAX_MAP_RESULTS)
     # Remembers which results the user has requested.
     session['requested_ids'] = [x['id'] for x in live_results] + [x['id'] for x in dead_results]
     return dict(
         locations=live_results,
         deleted_locations=dead_results,
-        maybe_incomplete=len(live_results) == MAX_MAP_RESULTS,
+        maybe_incomplete=maybe_incomplete,
         fields=LOCATION_FIELDS,
     )
 

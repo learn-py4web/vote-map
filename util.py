@@ -67,4 +67,8 @@ def get_results_in_region(db, lat_max, lat_min, lng_max, lng_min,
                 break
             n += 1
     # Filters results only in original view.
-    
+    clean_results = []
+    for loc in results.values():
+        if lat_min <= loc['lat'] <= lat_max and lng_min <= loc['lng'] <= lng_max:
+            clean_results.append(loc)
+    return clean_results, maybe_incomplete
