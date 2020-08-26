@@ -2,3 +2,20 @@ div.staticmap {
     height: 600px;  /* The height is 400 pixels */
     width: 100%;  /* The width is the width of the web page */
 }
+div.location_result {
+    border-top: 1px lightgrey;
+    border-left-style: none;
+    border-right-style: none;
+    border-top-style: solid;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    cursor: pointer;
+}
+div.location_result:hover {
+    background-color: #ececec;
+}
+div.location_list {
+    border-bottom: 1px lightgrey;
+    border-bottom-style: solid;
+    border-bottom-style: solid;
+}

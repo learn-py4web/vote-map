@@ -38,14 +38,15 @@ See https://developers.google.com/maps/documentation/urls/get-started
           <div v-if="!loc_specified && locations.length > 0">
             Your location has been guessed on the basis of your IP address.
           </div>
-          <table class="table is-narrow is-hoverable is-fullwidth location_list">
-            <tbody>
-            <tr v-for="loc in locations" @click="goto(loc._idx)">
-              <td>{{loc.name}}</td>
-            </tr>
-            </tbody>
-          </table>
-          <p v-if="locations.length > 0" class="has-text-grey">Click on a result to display it on a map.</p>
+          <div class="location_list">
+            <div v-for="loc in locations" class="location_result" @click="goto(loc._idx)">
+              <p>{{loc.name}}</p>
+              <p v-if="loc.address" class="is-size-6 has-text-grey">{{loc.address}}</p>
+            </div>
+          </div>
+          <div v-if="locations.length > 0" class="has-text-grey mt-4">
+            Click on a result to display it on a map.
+          </div>
         </div>
       </div>
 
