@@ -97,7 +97,7 @@ def get_locations():
 
 
 @action('edit')
-@action.uses('edit.html', url_signer, auth.user)
+@action.uses(auth.user, 'edit.html', url_signer)
 def edit():
     return dict(
         # This is an example of a signed URL for the callback.
