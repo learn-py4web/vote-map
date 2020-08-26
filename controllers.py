@@ -43,7 +43,7 @@ url_signer = URLSigner(session)
 
 
 @action('index')
-@action.uses('index.html', url_signer)
+@action.uses(auth, 'index.html', url_signer)
 def index():
     return dict(
         # This is an example of a signed URL for the callback.

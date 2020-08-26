@@ -39,7 +39,7 @@ elif settings.SESSION_TYPE == 'database':
 auth = Auth(session, db,
             registration_requires_confirmation=False,
             password_complexity=False,
-            use_username=False)
+            use_username=True)
 
 if auth.db:
     groups = Tags(db.auth_user, 'groups')
