@@ -31,10 +31,9 @@
           <div class="navbar-item">
             <div class="buttons">
               [[if globals().get('user'):]]
-              <a class="button is-primary" href="[[=URL('auth/logout')]]">Sign out</a>
+              <a class="button is-light" href="[[=URL('auth/logout')]]">Sign out</a>
               [[else:]]
-              <a class="button is-primary" href="[[=URL('auth/register')]]">Sign up</a>
-              <a class="button is-light" href="[[=URL('auth/login')]]">Sign in</a>
+              <a class="button is-primary" href="[[=URL('auth/plugin/oauth2google/login', vars=dict(next='../index'))]]">Sign In</a>
               [[pass]]
             </div>
           </div>
