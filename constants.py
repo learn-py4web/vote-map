@@ -2,6 +2,11 @@
 MAX_MAP_RESULTS = 25
 MAX_VIEW_RESULTS = 25
 
+# Square size
+SQSIZE = 0.1 # degrees
+
+DMAX = 0.5 # Maximum size of area inspected to be able to edit.
+
 # Reads zip code database.
 import json
 import os
