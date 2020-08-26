@@ -91,13 +91,11 @@ def get_concentric_results(db, lat_c, lng_c, max_radius=DMAX,
         num_points = 2 * n + 1
         lats = np.linspace(lat_c - n * SQSIZE, lat_c + n * SQSIZE, num_points)
         lngs = np.linspace(lng_c - n * SQSIZE, lng_c + n * SQSIZE, num_points)
-        print("n:", n, "lats:", lats, "lngs:", lngs)
         for lat in lats:
             for lng in lngs:
                 sq = latlng_to_square10(lat, lng)
                 if sq not in squares:
                     # The square is new.
-                    print("sq:", sq)
                     resl = query_square(db, sq, is_deleted=False)
                     results.update({r['id']: r for r in resl})
                     if len(results) >= max_results:

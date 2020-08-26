@@ -42,6 +42,9 @@ from .util import cleanup, latlng_to_square10, get_results_in_region, get_concen
 url_signer = URLSigner(session)
 
 
+### PAGES
+
+
 @action('index')
 @action.uses(auth, 'index.html', url_signer)
 def index():
@@ -51,6 +54,26 @@ def index():
         get_locations_url = URL('get_locations', signer=url_signer),
         MAPS_API_KEY = MAPS_API_KEY
     )
+
+
+@action('edit')
+@action.uses(auth.user, 'edit.html', url_signer)
+def edit():
+    return dict(
+        # This is an example of a signed URL for the callback.
+        # See the index.html template for how this is passed to the javascript.
+        callback_url = URL('edit_callback', signer=url_signer),
+        MAPS_API_KEY = MAPS_API_KEY
+    )
+
+
+@action('info')
+@action.uses(auth, 'info.html')
+def info():
+    return dict()
+
+
+### API
 
 
 @action('get_locations')
@@ -81,17 +104,6 @@ def get_locations():
         locations=locations,
         loc_specified=loc_specified,
         fields=LOCATION_FIELDS,
-    )
-
-
-@action('edit')
-@action.uses(auth.user, 'edit.html', url_signer)
-def edit():
-    return dict(
-        # This is an example of a signed URL for the callback.
-        # See the index.html template for how this is passed to the javascript.
-        callback_url = URL('edit_callback', signer=url_signer),
-        MAPS_API_KEY = MAPS_API_KEY
     )
 
 

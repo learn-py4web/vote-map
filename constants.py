@@ -6,8 +6,8 @@ ENOUGH_RESULTS = 1 # Don't search beyond a good radius
 # Square size
 SQSIZE = 0.1 # degrees
 
-DMAX = 1.0 # Maximum size of area inspected to be able to edit.
-DGOOD = 0.4
+DMAX = 0.5 # Maximum size of area inspected to be able to edit.
+DGOOD = 0.2
 
 # Reads zip code database.
 import json
