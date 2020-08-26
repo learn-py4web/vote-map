@@ -77,8 +77,8 @@ def get_results_in_region(db, lat_max, lat_min, lng_max, lng_min,
     return clean_results, maybe_incomplete
 
 
-def get_concentric_results(db, lat_c, lng_c, max_radius=1.,
-                           max_results=25):
+def get_concentric_results(db, lat_c, lng_c, max_radius=DMAX,
+                           good_radius=DGOOD, max_results=25, enough_results=1):
     """Returns the list of results around a given point, until either
     max_radius is reached, or until the max number of results is
     accummulated.  Returns the list of results.
@@ -90,21 +90,26 @@ def get_concentric_results(db, lat_c, lng_c, max_radius=1.,
     while True:
         num_points = 2 * n + 1
         lats = np.linspace(lat_c - n * SQSIZE, lat_c + n * SQSIZE, num_points)
-        lngs = np.linspace(lat_c - n * SQSIZE, lat_c + n * SQSIZE, num_points)
+        lngs = np.linspace(lng_c - n * SQSIZE, lng_c + n * SQSIZE, num_points)
+        print("n:", n, "lats:", lats, "lngs:", lngs)
         for lat in lats:
             for lng in lngs:
                 sq = latlng_to_square10(lat, lng)
                 if sq not in squares:
                     # The square is new.
+                    print("sq:", sq)
                     resl = query_square(db, sq, is_deleted=False)
                     results.update({r['id']: r for r in resl})
-                    if len(results) > max_results:
+                    if len(results) >= max_results:
                         break
                 squares.add(sq)
-            if len(results) > max_results:
+            if len(results) >= max_results:
                 break
         # We got enough results.
-        if len(results) > max_results:
+        if len(results) >= max_results:
+            break
+        # We got some results.
+        if len(results) >= enough_results and n > good_radius / SQSIZE:
             break
         # We looked at all squares.
         if n > max_radius / SQSIZE:

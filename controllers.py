@@ -37,7 +37,7 @@ from . models import LOCATION_FIELDS, get_user_email
 from . settings_private import MAPS_API_KEY
 from .test_data import TEST_LOCATIONS
 from .constants import *
-from .util import cleanup, latlng_to_square10, get_results_in_region
+from .util import cleanup, latlng_to_square10, get_results_in_region, get_concentric_results
 
 url_signer = URLSigner(session)
 
@@ -63,7 +63,6 @@ def get_locations():
         r = ZIPCODE_LOCATIONS.get(zipcode)
         if r is not None:
             lat, lng = r
-            print("Found:", lat, lng)
             loc_specified = True
     if not loc_specified:
         appengine_loc = request.get_header("X-Appengine-CityLatLong")
@@ -76,21 +75,10 @@ def get_locations():
                 loc_specified=False,
             )
     # Gets many locations from center.
-    all_results = {} # id to record, for uniqueness.
-    for d in [0.05, 0.1, 0.2, 0.4, 0.8, 1.6]:
-        lat_min, lat_max = lat - d, lat + d
-        lng_min, lng_max = lng - d, lng + d
-        q = ((db.location.lat >= lat_min) & (db.location.lat <= lat_max) &
-             (db.location.lng >= lng_min) & (db.location.lng <= lng_max))
-        q &= (db.location.is_deleted == False)
-        r = db(q).select(limitby=(0, MAX_VIEW_RESULTS)).as_list()
-        all_results.update({rec['id']: cleanup(rec, ["square10", "author", "date_created", "date_updated"]) for rec in r})
-        print ("For", d, "found", len(all_results), "results.")
-        if len(all_results) >= MAX_VIEW_RESULTS:
-            break
-    # Need to sort the results.
+    locations = get_concentric_results(
+        db, lat, lng, max_results=MAX_VIEW_RESULTS, enough_results=ENOUGH_RESULTS)
     return dict(
-        locations=list(all_results.values()),
+        locations=locations,
         loc_specified=loc_specified,
         fields=LOCATION_FIELDS,
     )
