@@ -25,19 +25,21 @@ def get_results_in_region(db, lat_max, lat_min, lng_max, lng_min,
     Tries to minimize queries not to get more than max_results.
     Returns a list of results, and a flag indicating that the results may be incomplete.
     """
+    results = {}
     # Determines the squares of the corner points.
-    squares = {latlng_to_square10(y, x) for (x, y) in
+    squares = {latlng_to_square10(x, y) for (x, y) in
                [(lat_max, lng_max), (lat_max, lng_min),
                 (lat_min, lng_max), (lat_min, lng_min)]}
     maybe_incomplete = False
     if len(squares) == 1:
         sq = squares.pop()
+        print("Searching for single square:", sq)
         # Looking at a single square is enough.
-        results = query_square(db, sq, is_deleted=is_deleted)
+        resl = query_square(db, sq, is_deleted=is_deleted)
+        results.update({r['id']: r for r in resl})
     else:
         # More than one square.  Goes from the center out.
         squares = set()
-        results = {}
         lat_c = (lat_max + lat_min) / 2.
         lng_c = (lng_max + lng_min) / 2.
         # Progressively enlarges.
