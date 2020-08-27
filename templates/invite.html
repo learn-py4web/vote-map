@@ -15,17 +15,13 @@
   [[pass]]
 
   [[if can_edit:]]
-    <p>You can edit the site.</p>
-
     [[if can_invite:]]
-      <p>You can also invite others to edit the site.
-      To do so, you can give them the invitation code below,
-      or send them the invitation URL.</p>
+      <p>To invite others to edit this site, give them the invitation code below:
+      </p>
 
-      <div class="box">
-        <div>Invitation code: [[=invitation_code]]</div>
-        <div class="mt-4">Invitation URL:
-          <a href="[[=invitation_url]]">[[=invitation_url]]</a>
+      <div class="box mt-4">
+        <div>Invitation code:
+          <input class="input" type="text" value="[[=invitation_code]]" readonly>
         </div>
       </div>
 
@@ -34,7 +30,7 @@
       one, you can click on the button below.  If you generate a new code,
       all your pending invitations using old codes will no longer be accepted.</div>
       <div class="mt-5">
-        <a class="button is-danger" href="[[=refresh_url]]">Regenerate Invitation Code</a>
+        <a class="button is-danger" href="[[=refresh_url]]">Regenerate invitation code</a>
       </div>
 
     [[else:]]

@@ -81,17 +81,14 @@ def invite():
     r = db(db.userinfo.email == get_user_email()).select().first()
     if r is not None and r.can_edit and r.can_invite:
         invitation_code = r.invitation_code
-        invitation_url = URL('validate_code', vars=dict(code=invitation_code))
     else:
         invitation_code = None
-        invitation_url = None
     return dict(
         invalid = invalid,
         reason = reason,
         can_edit = r is not None and r.can_edit,
         can_invite = r is not None and r.can_invite,
         invitation_code = invitation_code,
-        invitation_url = invitation_url,
         validate_url = URL('validate_code'),
         refresh_url = URL('refresh_code', signer=url_signer),
     )
