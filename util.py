@@ -1,4 +1,6 @@
 import numpy as np
+import hashlib, uuid
+
 from .constants import *
 
 def cleanup(d, el_list):
@@ -109,3 +111,12 @@ def get_concentric_results(db, lat_c, lng_c, max_radius=DMAX,
             break
         n += 1
     return list(results.values())
+
+
+def generate_invitation_code():
+    s = str(uuid.uuid1())
+    h = hashlib.sha1(s.encode('utf8'))
+    t = h.hexdigest()
+    n = len(t)
+    p = [t[4 * i : 4 * (i + 1)] for i in range((n + 1) // 4)]
+    return "-".join(p)

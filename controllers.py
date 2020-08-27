@@ -39,7 +39,7 @@ from . models import LOCATION_FIELDS, get_user_email
 from . settings_private import MAPS_API_KEY, GEOLOCATION_KEY
 from .test_data import TEST_LOCATIONS
 from .constants import *
-from .util import cleanup, latlng_to_square10, get_results_in_region, get_concentric_results
+from .util import generate_invitation_code, cleanup, latlng_to_square10, get_results_in_region, get_concentric_results
 
 url_signer = URLSigner(session)
 
@@ -111,7 +111,7 @@ def validate_code():
         redirect(URL('invite', vars=dict(invalid=True, reason="Invalid invitation")))
     # The invitation is valid.
     # Creates a new code, to invite in turn.
-    invitation_code = str(uuid.uuid1())
+    invitation_code = generate_invitation_code()
     # Writes the record.
     db.userinfo.insert(
         can_edit=True,
@@ -128,7 +128,7 @@ def refresh_code():
     r = db(db.userinfo.email == get_user_email()).select().first()
     if r is None or not r.can_invite:
         redirect(URL('invite'))
-    r.update_record(invitation_code=str(uuid.uuid1()))
+    r.update_record(invitation_code=generate_invitation_code())
     redirect(URL('invite', vars=dict(reason="Your invitation code has been refreshed")))
 
 
@@ -333,7 +333,7 @@ def grantinitial():
             can_edit=True,
             can_invite=True,
             invited_by=None,
-            invitation_code=str(uuid.uuid1()),
+            invitation_code=generate_invitation_code(),
         )
         return "ok"
     return "exists"
