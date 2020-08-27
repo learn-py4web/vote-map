@@ -57,6 +57,7 @@ db.define_table(
     Field('lng', 'double'),
     Field('address_lat', 'double'),
     Field('address_lng', 'double'),
+    Field('square10'),
     Field('name'),
     Field('loc_type'),
     Field('type_other'),
