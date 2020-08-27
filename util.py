@@ -11,6 +11,8 @@ def cleanup(d, el_list):
 def latlng_to_square10(lat, lng):
     return "%.0f;%.0f" % (lat / SQSIZE, lng / SQSIZE)
 
+def latlngidx_to_square10(lat_idx, lng_idx):
+    return "%d;%d" % (lat_idx, lng_idx)
 
 def query_square(db, sq, is_deleted=False):
     """Returns the results for a given square."""
@@ -26,53 +28,40 @@ def get_results_in_region(db, lat_max, lat_min, lng_max, lng_min,
     Returns a list of results, and a flag indicating that the results may be incomplete.
     """
     results = {}
-    # Determines the squares of the corner points.
-    squares = {latlng_to_square10(x, y) for (x, y) in
-               [(lat_max, lng_max), (lat_max, lng_min),
-                (lat_min, lng_max), (lat_min, lng_min)]}
     maybe_incomplete = False
-    if len(squares) == 1:
-        sq = squares.pop()
-        # Looking at a single square is enough.
-        resl = query_square(db, sq, is_deleted=is_deleted)
-        results.update({r['id']: r for r in resl})
+    # Computes how many squares are needed.
+    lat_min_idx = int(0.5 + lat_min / SQSIZE)
+    lat_max_idx = int(0.5 + lat_max / SQSIZE)
+    lat_c_idx = int(0.5 + (lat_max - lat_min) / (2 * SQSIZE))
+    lng_min_idx = int(0.5 + lng_min / SQSIZE)
+    lng_max_idx = int(0.5 + lng_max / SQSIZE)
+    lng_c_idx = int(0.5 + (lng_max - lng_min) / (2 * SQSIZE))
+    lat_n = lat_max_idx - lat_min_idx + 1
+    lng_n = lng_max_idx - lng_min_idx + 1
+    # If there are too many, just takes the center 3x3.
+    if lat_n > 3:
+        maybe_incomplete = True
+        lat_idxs = list(range(lat_c_idx - 1, lat_c_idx + 2))
     else:
-        # More than one square.  Goes from the center out.
-        squares = set()
-        lat_c = (lat_max + lat_min) / 2.
-        lng_c = (lng_max + lng_min) / 2.
-        # Progressively enlarges.
-        n = 0
-        while True:
-            num_points = 2 * n + 1
-            lats = np.linspace(lat_c - n * SQSIZE, lat_c + n * SQSIZE, num_points)
-            lngs = np.linspace(lng_c - n * SQSIZE, lng_c + n * SQSIZE, num_points)
-            for lat in lats:
-                for lng in lngs:
-                    sq = latlng_to_square10(lat, lng)
-                    if sq not in squares:
-                        # The square is new.
-                        resl = query_square(db, sq, is_deleted=is_deleted)
-                        results.update({r['id']: r for r in resl})
-                        if len(results) > max_results:
-                            break
-                    squares.add(sq)
-                if len(results) > max_results:
-                    maybe_incomplete = True
-                    break
-            # We got enough results.
-            if len(results) > max_results:
+        lat_idxs = list(range(lat_min_idx, lat_max_idx + 1))
+    if lng_n > 3:
+        maybe_incomplete = True
+        lng_idxs = list(range(lng_c_idx - 1, lng_c_idx + 2))
+    else:
+        lng_idxs = list(range(lng_min_idx, lng_max_idx + 1))
+    num_squares = len(lat_idxs) * len(lng_idxs)
+    # Queries the squares.
+    for lat_idx in lat_idxs:
+        for lng_idx in lng_idxs:
+            sq = latlngidx_to_square10(lat_idx, lng_idx)
+            resl = query_square(db, sq, is_deleted=is_deleted)
+            results.update({r['id']: r for r in resl})
+            if len(results) > max_results and num_squares > 1:
                 maybe_incomplete = True
                 break
-            # We looked at all squares.
-            if lats[0] < lat_min and lats[-1] > lat_max and lngs[0] < lng_min and lngs[-1] > lng_max:
-                break
-            # We eventually get out.
-            if n > max_radius / SQSIZE:
-                maybe_incomplete = True
-                break
-            n += 1
-    print("Num squares:", len(squares))
+        if len(results) > max_results and num_squares > 1:
+            maybe_incomplete = True
+            break
     # Filters results only in original view.
     clean_results = []
     for loc in results.values():

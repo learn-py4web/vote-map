@@ -4,10 +4,6 @@
 <link rel="stylesheet" href="css/index.css">
 [[end]]
 
-<!--
-See https://developers.google.com/maps/documentation/urls/get-started
--->
-
 <section class="section">
 
   <div id="vue-target">
@@ -31,7 +27,7 @@ See https://developers.google.com/maps/documentation/urls/get-started
           No locations found.
         </div>
         <div v-if="locations.length === 0" class="mt-5">
-          Enter a zip code to search the database of locations where ballots can be returned.
+          Enter a zip code to search for locations where ballots can be returned.
         </div>
         <div v-else>
           <div class="subtitle">Locations:</div>
