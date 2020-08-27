@@ -19,7 +19,7 @@ def query_square(db, sq, is_deleted=False):
 
 
 def get_results_in_region(db, lat_max, lat_min, lng_max, lng_min,
-                          is_deleted=False, max_results=25):
+                          is_deleted=False, max_results=25, max_radius=DMAX):
     """Returns the list of results in a given rectangle, for either
     normal locations (is_deleted=False) or deleted locations (is_delete=True).
     Tries to minimize queries not to get more than max_results.
@@ -33,7 +33,6 @@ def get_results_in_region(db, lat_max, lat_min, lng_max, lng_min,
     maybe_incomplete = False
     if len(squares) == 1:
         sq = squares.pop()
-        print("Searching for single square:", sq)
         # Looking at a single square is enough.
         resl = query_square(db, sq, is_deleted=is_deleted)
         results.update({r['id']: r for r in resl})
@@ -47,7 +46,7 @@ def get_results_in_region(db, lat_max, lat_min, lng_max, lng_min,
         while True:
             num_points = 2 * n + 1
             lats = np.linspace(lat_c - n * SQSIZE, lat_c + n * SQSIZE, num_points)
-            lngs = np.linspace(lat_c - n * SQSIZE, lat_c + n * SQSIZE, num_points)
+            lngs = np.linspace(lng_c - n * SQSIZE, lng_c + n * SQSIZE, num_points)
             for lat in lats:
                 for lng in lngs:
                     sq = latlng_to_square10(lat, lng)
@@ -68,7 +67,12 @@ def get_results_in_region(db, lat_max, lat_min, lng_max, lng_min,
             # We looked at all squares.
             if lats[0] < lat_min and lats[-1] > lat_max and lngs[0] < lng_min and lngs[-1] > lng_max:
                 break
+            # We eventually get out.
+            if n > max_radius / SQSIZE:
+                maybe_incomplete = True
+                break
             n += 1
+    print("Num squares:", len(squares))
     # Filters results only in original view.
     clean_results = []
     for loc in results.values():

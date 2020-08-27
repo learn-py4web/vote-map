@@ -4,9 +4,9 @@ MAX_VIEW_RESULTS = 25
 ENOUGH_RESULTS = 1 # Don't search beyond a good radius
 
 # Square size
-SQSIZE = 0.1 # degrees
+SQSIZE = 0.2 # degrees
 
-DMAX = 0.5 # Maximum size of area inspected to be able to edit.
+DMAX = 0.6 # Maximum size of area inspected to be able to edit.
 DGOOD = 0.2
 
 # For geolocation
