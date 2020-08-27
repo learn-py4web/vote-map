@@ -25,7 +25,7 @@ def query_square(db, sq, is_deleted=False):
 
 
 def get_results_in_region(db, lat_max, lat_min, lng_max, lng_min,
-                          is_deleted=False, max_results=25, max_radius=DMAX):
+                          is_deleted=False, max_results=MAX_MAP_RESULTS, max_radius=DMAX):
     """Returns the list of results in a given rectangle, for either
     normal locations (is_deleted=False) or deleted locations (is_delete=True).
     Tries to minimize queries not to get more than max_results.
@@ -75,7 +75,7 @@ def get_results_in_region(db, lat_max, lat_min, lng_max, lng_min,
 
 
 def get_concentric_results(db, lat_c, lng_c, max_radius=DMAX,
-                           good_radius=DGOOD, max_results=25, enough_results=1):
+                           good_radius=DGOOD, max_results=MAX_VIEW_RESULTS, enough_results=1):
     """Returns the list of results around a given point, until either
     max_radius is reached, or until the max number of results is
     accummulated.  Returns the list of results.

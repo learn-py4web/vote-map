@@ -1,6 +1,6 @@
 # Used in maps edit mode.
-MAX_MAP_RESULTS = 25
-MAX_VIEW_RESULTS = 25
+MAX_MAP_RESULTS = 50
+MAX_VIEW_RESULTS = 50
 ENOUGH_RESULTS = 1 # Don't search beyond a good radius
 
 # Square size -- If you change this you break the db!
