@@ -84,3 +84,17 @@ CREATE TABLE `zipcode` (
     PRIMARY KEY (`id`),
     KEY `zipcode__idx` (`zipcode`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE `userinfo` (
+    `id` int(11) AUTO_INCREMENT NOT NULL,
+    `email` varchar(255),
+    `can_edit` varchar(1),
+    `can_invite` varchar(1),
+    `invited_by` varchar(255),
+    `invitation_code` varchar(255),
+    `date_created` datetime DEFAULT NULL,
+    `date_updated` datetime DEFAULT NULL,
+    PRIMARY KEY (`id`),
+    KEY `email__idx` (`email`),
+    KEY `invitation_code__idx` (`invitation_code`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
