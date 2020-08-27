@@ -8,11 +8,13 @@ def cleanup(d, el_list):
             del d[el]
     return d
 
-def latlng_to_square10(lat, lng):
-    return "%.0f;%.0f" % (lat / SQSIZE, lng / SQSIZE)
-
 def latlngidx_to_square10(lat_idx, lng_idx):
     return "%d;%d" % (lat_idx, lng_idx)
+
+def latlng_to_square10(lat, lng):
+    lat_idx = int(lat / SQSIZE)
+    lng_idx = int(lng / SQSIZE)
+    return latlngidx_to_square10(lat_idx, lng_idx)
 
 def query_square(db, sq, is_deleted=False):
     """Returns the results for a given square."""
@@ -30,12 +32,12 @@ def get_results_in_region(db, lat_max, lat_min, lng_max, lng_min,
     results = {}
     maybe_incomplete = False
     # Computes how many squares are needed.
-    lat_min_idx = int(0.5 + lat_min / SQSIZE)
-    lat_max_idx = int(0.5 + lat_max / SQSIZE)
-    lat_c_idx = int(0.5 + (lat_max - lat_min) / (2 * SQSIZE))
-    lng_min_idx = int(0.5 + lng_min / SQSIZE)
-    lng_max_idx = int(0.5 + lng_max / SQSIZE)
-    lng_c_idx = int(0.5 + (lng_max - lng_min) / (2 * SQSIZE))
+    lat_min_idx = int(lat_min / SQSIZE)
+    lat_max_idx = int(lat_max / SQSIZE)
+    lat_c_idx = int((lat_max - lat_min) / (2 * SQSIZE))
+    lng_min_idx = int(lng_min / SQSIZE)
+    lng_max_idx = int(lng_max / SQSIZE)
+    lng_c_idx = int((lng_max - lng_min) / (2 * SQSIZE))
     lat_n = lat_max_idx - lat_min_idx + 1
     lng_n = lng_max_idx - lng_min_idx + 1
     # If there are too many, just takes the center 3x3.

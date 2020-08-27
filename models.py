@@ -32,12 +32,10 @@ db.define_table(
     Field('name'),
     Field('loc_type'),
     Field('type_other'),
-    Field('date_open', 'date'),
-    Field('date_close', 'date'),
-    Field('time_open', 'time'),
-    Field('time_close', 'time'),
+    Field('county'),
     Field('address', 'text'),
     Field('rules', 'text'),
+    Field('notes', 'text'),
     Field('date_created', 'datetime', default=get_time),
     Field('date_updated', 'datetime', update=get_time),
 )
@@ -45,8 +43,8 @@ db.define_table(
 # These are also given to the webapp.
 LOCATION_FIELDS = [
     'id', 'is_deleted', 'lat', 'lng', 'address_lat', 'address_lng',
-    'name', 'loc_type', 'type_other', 'date_open', 'date_close',
-    'time_open', 'time_close', 'address', 'rules'
+    'name', 'loc_type', 'type_other', 'county',
+    'address', 'rules', 'notes',
 ]
 
 
@@ -62,14 +60,12 @@ db.define_table(
     Field('name'),
     Field('loc_type'),
     Field('type_other'),
-    Field('date_open', 'date'),
-    Field('date_close', 'date'),
-    Field('time_open', 'time'),
-    Field('time_close', 'time'),
+    Field('county'),
     Field('address', 'text'),
+    Field('rules', 'text'),
+    Field('notes', 'text'),
     Field('max_zoom', 'integer'), # Max zoom level used in edit.
     Field('edit_time', 'integer'), # How long did the edit last.
-    Field('rules', 'text'),
     Field('timestamp', 'datetime', default=get_time),
 )
 

@@ -71,25 +71,16 @@
               <input class="input" placeholder="Type of location" v-if="eloc.loc_type==='Other'" v-model="eloc.type_other">
             </div>
             <div class="field">
+              <label class="label">County</label>
+              <input class="input" v-model="eloc.county" placeholder="County name">
+            </div>
+            <div class="field">
               <label class="label">Rules</label>
               <textarea class="textarea" v-model="eloc.rules" rows="2" placeholder="Who can bring ballots, can one bring them for others, ..."></textarea>
             </div>
             <div class="field">
-              <label class="label">Open from date</label>
-              <input class="input" type="date" v-model="eloc.date_open">
-            </div>
-            <div class="field">
-              <label class="label">Closing on date</label>
-              <input class="input" type="date" v-model="eloc.date_close">
-            </div>
-            <div class="field">
-              <label class="label">Daily opening time</label>
-              <input class="input" type="time" v-model="eloc.time_open">
-            </div>
-            <div class="field">
-              <label class="label">Daily closing time</label>
-              <input class="input" type="time" v-model="eloc.time_close">
-              <p class="has-text-grey">Leave times blank if open all day</p>
+              <label class="label">Notes</label>
+              <textarea class="textarea" v-model="eloc.notes" rows="2" placeholder="When is the site open, when does collection happen, ..."></textarea>
             </div>
             <div class="field">
               <label class="checkbox">

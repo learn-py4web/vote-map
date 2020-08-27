@@ -57,6 +57,10 @@
             <p>{{eloc.name}}</p>
           </div>
           <div class="field">
+            <label for="county" class="label">County</label>
+            <p>{{eloc.county}}</p>
+          </div>
+          <div class="field">
             <label class="label">Address</label>
             <p style="white-space: pre-wrap;">{{eloc.address}}</p>
           </div>
@@ -69,21 +73,9 @@
             <label class="label">Rules</label>
             <p style="white-space: pre-wrap;">{{eloc.rules}}</p>
           </div>
-          <div v-if="eloc.date_open" class="field">
-            <label class="label">Open from date</label>
-            <p>{{eloc.date_open}}</p>
-          </div>
-          <div v-if="eloc.date_close" class="field">
-            <label class="label">Closing on date</label>
-            <p>{{eloc.date_close}}</p>
-          </div>
-          <div v-if="eloc.time_open" class="field">
-            <label class="label">Daily opening time</label>
-            <p>{{eloc.time_open}}</p>
-          </div>
-          <div v-if="eloc.time_close" class="field">
-            <label class="label">Daily closing time</label>
-            <p>{{eloc.time_close}}</p>
+          <div v-if="eloc.notes" class="field">
+            <label class="label">Notes</label>
+            <p style="white-space: pre-wrap;">{{eloc.notes}}</p>
           </div>
         </div>
 
