@@ -95,8 +95,8 @@ db.define_table(
     Field('can_invite', 'boolean'),
     Field('invited_by'),
     Field('invitation_code'),
-    Field('created_date', 'datetime', default=get_time),
-    Field('updated_date', 'datetime', update=get_time),
+    Field('date_created', 'datetime', default=get_time),
+    Field('date_updated', 'datetime', update=get_time),
 )
 
 
