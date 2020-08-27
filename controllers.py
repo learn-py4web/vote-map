@@ -129,7 +129,7 @@ def refresh_code():
     if r is None or not r.can_invite:
         redirect(URL('invite'))
     r.update_record(invitation_code=generate_invitation_code())
-    redirect(URL('invite', vars=dict(reason="Your invitation code has been refreshed")))
+    redirect(URL('invite', vars=dict(reason="Your invitation code has been regenerated")))
 
 
 @action('info')
