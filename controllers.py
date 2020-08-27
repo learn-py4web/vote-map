@@ -94,7 +94,7 @@ def invite():
     )
 
 
-@action('validate_code')
+@action('validate_code', method="POST")
 @action.uses(db, auth.user)
 def validate_code():
     """Checks whether the invitation is valid, and if so, grants permissions."""
