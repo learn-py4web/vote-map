@@ -6,6 +6,7 @@
 
 <section class="section">
 
+  [[if can_edit:]]
   <div id="vue-target">
 
     <div class="columns">
@@ -118,11 +119,31 @@
       </div>
     </div>
 
-
   </div>
+
+  [[ else: ]]
+    <!-- Cannot edit -->
+    <div class="content">
+      You do not currently have permission to edit this site.
+      To be able to edit this site, you need an <em>invitation code.</em>
+      There are two ways to get such a code:
+      <ul>
+        <li><b>Ask another editor:</b> You can ask someone who can edit
+        to send you an invitation code.  Editors can find these codes in the <em>invite</em>
+        tab of the web site.</li>
+        <li><b>Ask the site maintainers:</b> You can email
+        <a href="mailto:vote-map@googlegroups.com">vote-map@googlegroups.com</a>
+          explaining why you would like to edit the information, and what your role
+          in the elections is.
+        </li>
+      </ul>
+      Once you obtain an invitation code, you can enter it in the <em>invite</em> tab.
+    </div>
+  [[pass]]
 
 </section>
 
+[[if can_edit:]]
 [[block page_scripts]]
 <!-- Loads the index-specific js for Vue -->
 <script>
@@ -134,3 +155,4 @@
 <script async defer src="https://maps.googleapis.com/maps/api/js?key=[[=MAPS_API_KEY]]&callback=initMap"
   type="text/javascript"></script>
 [[end]]
+[[pass]]

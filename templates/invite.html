@@ -1,0 +1,85 @@
+[[extend 'layout.html']]
+
+[[block page_head]]
+[[end]]
+
+<section class="section">
+
+  <!-- Message -->
+  [[if reason:]]
+    [[if invalid:]]
+      <div class="notification is-danger">[[=reason]]</div>
+    [[else:]]
+      <div class="notification is-info">[[=reason]]</div>
+    [[pass]]
+  [[pass]]
+
+  [[if can_edit:]]
+    <p>You can edit the site.</p>
+
+    [[if can_invite:]]
+      <p>You can also invite others to edit the site.
+      To do so, you can give them the invitation code below,
+      or send them the invitation URL.</p>
+
+      <div class="box">
+        <div>Invitation code: [[=invitation_code]]</div>
+        <div class="mt-4">Invitation URL:
+          <a href="[[=invitation_url]]">[[=invitation_url]]</a>
+        </div>
+      </div>
+
+      <div class="subtitle mt-5">If you code has been compromised...</div>
+      <div>To invalidate your current invitation code, and generate a new
+      one, you can click on the button below.  If you generate a new code,
+      all your pending invitations using old codes will no longer be accepted.</div>
+      <div class="mt-5">
+        <a class="button is-danger" href="[[=refresh_url]]">Regenerate Invitation Code</a>
+      </div>
+
+    [[else:]]
+      <p>You cannot invite others to edit the site.
+      Please contact the site managers if you think that this is a mistake.</p>
+    [[pass]]
+
+  [[else:]]
+
+    <div class="content">
+      To be able to edit this site, you need an <em>invitation code.</em>
+      There are two ways to get such a code:
+      <ul>
+        <li><b>Ask another editor:</b> You can ask someone who can edit
+        to send you an invitation code.  Editors can find these codes
+          in the <em>invite</em> tab of the web site.</li>
+        <li><b>Ask the site maintainers:</b> You can email
+        <a href="mailto:vote-map@googlegroups.com">vote-map@googlegroups.com</a>
+          explaining why you would like to edit the information, and what your role
+          in the elections is.
+        </li>
+      </ul>
+      Once you obtain an invitation code, you can enter it below.
+    </div>
+
+    <div class="mt-5">
+      <!-- Form for entering an invitation code -->
+      <form action="[[=validate_url]]" enctype="multipart/form-data" method="POST">
+        <div class="field">
+          <label class="label" for="code">Invitation code</label>
+          <div class="control">
+            <input class="input" type="text" name="code" placeholder="Enter your invitation code here">
+          </div>
+        </div>
+        <div class="field">
+          <div class="control">
+            <input class="button is-link" type="submit" value="Submit">
+          </div>
+        </div>
+      </form>
+    </div>
+
+  [[pass]]
+
+</section>
+
+[[block page_scripts]]
+[[end]]

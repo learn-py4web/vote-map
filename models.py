@@ -88,4 +88,16 @@ db.define_table(
 )
 
 
+db.define_table(
+    'userinfo',
+    Field('email', default=get_user_email),
+    Field('can_edit', 'boolean'),
+    Field('can_invite', 'boolean'),
+    Field('invited_by'),
+    Field('invitation_code'),
+    Field('created_date', 'datetime', default=get_time),
+    Field('updated_date', 'datetime', update=get_time),
+)
+
+
 db.commit()

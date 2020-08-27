@@ -60,13 +60,79 @@ def index():
 @action('edit')
 @action.uses(auth.user, 'edit.html', url_signer)
 def edit():
+    # Checks if the user can edit.
+    r = db(db.userinfo.email == get_user_email()).select().first()
     return dict(
+        can_edit = False if r is None else r.can_edit,
         # This is an example of a signed URL for the callback.
         # See the index.html template for how this is passed to the javascript.
         geolocation_url = URL('geolocation', signer=url_signer),
         callback_url = URL('edit_callback', signer=url_signer),
         MAPS_API_KEY = MAPS_API_KEY
     )
+
+
+@action('invite')
+@action.uses(db, auth.user, 'invite.html', url_signer)
+def invite():
+    # Checks if the user can edit and/or invite.
+    invalid = request.params.get('invalid')
+    reason = request.params.get('reason')
+    r = db(db.userinfo.email == get_user_email()).select().first()
+    if r is not None and r.can_edit and r.can_invite:
+        invitation_code = r.invitation_code
+        invitation_url = URL('validate_code', vars=dict(code=invitation_code))
+    else:
+        invitation_code = None
+        invitation_url = None
+    return dict(
+        invalid = invalid,
+        reason = reason,
+        can_edit = r is not None and r.can_edit,
+        can_invite = r is not None and r.can_invite,
+        invitation_code = invitation_code,
+        invitation_url = invitation_url,
+        validate_url = URL('validate_code'),
+        refresh_url = URL('refresh_code', signer=url_signer),
+    )
+
+
+@action('validate_code')
+@action.uses(db, auth.user)
+def validate_code():
+    """Checks whether the invitation is valid, and if so, grants permissions."""
+    code = request.params.get('code')
+    if code is None:
+        redirect(URL('invite', vars=dict(invalid=True, reason="Invalid invitation")))
+    # Checks not invited already.
+    r = db(db.userinfo.email == get_user_email()).select().first()
+    if r is not None:
+        redirect(URL('invite', vars=dict(invalid=True, reason="You have already been invited")))
+    # Looks up the code.
+    inviter = db(db.userinfo.invitation_code == code).select().first()
+    if inviter is None or not inviter.can_invite:
+        redirect(URL('invite', vars=dict(invalid=True, reason="Invalid invitation")))
+    # The invitation is valid.
+    # Creates a new code, to invite in turn.
+    invitation_code = str(uuid.uuid1())
+    # Writes the record.
+    db.userinfo.insert(
+        can_edit=True,
+        can_invite=True,
+        invited_by=inviter.email,
+        invitation_code=invitation_code,
+    )
+    redirect(URL('invite', vars=dict(reason="You can now edit the site")))
+
+
+@action('refresh_code')
+@action.uses(db, auth.user, url_signer.verify())
+def refresh_code():
+    r = db(db.userinfo.email == get_user_email()).select().first()
+    if r is None or not r.can_invite:
+        redirect(URL('invite'))
+    r.update_record(invitation_code=str(uuid.uuid1()))
+    redirect(URL('invite', vars=dict(reason="Your invitation code has been refreshed")))
 
 
 @action('info')
@@ -84,6 +150,11 @@ def info():
 @action('_ah/warmup')
 def warmup():
     return "ok"
+
+
+@action('/favicon.ico')
+def favicon():
+    return open('static/images/favicon.ico').read()
 
 
 ### API

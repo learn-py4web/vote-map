@@ -26,6 +26,7 @@
         <div class="navbar-start">
           [[if globals().get('user'):]]
           <a class="navbar-item" href="[[=URL('edit')]]">edit</a>
+          <a class="navbar-item" href="[[=URL('invite')]]">invite</a>
           [[pass]]
           <a class="navbar-item" href="[[=URL('info')]]">info</a>
           [[block page_menu_items]]<!-- individual pages can add menu items here -->[[end]]
