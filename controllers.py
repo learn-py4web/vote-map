@@ -176,8 +176,11 @@ def post_edit():
     id = loc.get('id')
     if loc is None:
         return "ok" # Silent discard.
-    if  id is not None and id not in session.get('requested_ids', []):
+    if id is not None and id not in session.get('requested_ids', []):
         return "ok" # Silent discard.
+    if not loc.get('name'):
+        # No empty names.
+        return HTTP(500)
     d = {p: loc.get(p) for p in LOCATION_FIELDS}
     max_zoom = request.json.get('mz')
     edit_time = request.json.get('dt');
