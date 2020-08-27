@@ -163,12 +163,16 @@ def geolocation():
     address = request.params.get('address')
     if address is None:
         return {}
+    # Cleans the string.
+    address = address.encode('ascii',errors='ignore').decode()
     r = requests.get(GEOLOCATION_URL, params={
         "key": GEOLOCATION_KEY,
         "address": address})
     if r.status_code == 200:
         return r.json()
     else:
+        print(r.status_code)
+        print(r.content)
         raise HTTP(500)
 
 
