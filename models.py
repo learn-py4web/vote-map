@@ -36,7 +36,7 @@ db.define_table(
     Field('date_close', 'date'),
     Field('time_open', 'time'),
     Field('time_close', 'time'),
-    Field('address'),
+    Field('address', 'text'),
     Field('rules', 'text'),
     Field('date_created', 'datetime', default=get_time),
     Field('date_updated', 'datetime', update=get_time),
@@ -66,7 +66,7 @@ db.define_table(
     Field('date_close', 'date'),
     Field('time_open', 'time'),
     Field('time_close', 'time'),
-    Field('address'),
+    Field('address', 'text'),
     Field('max_zoom', 'integer'), # Max zoom level used in edit.
     Field('edit_time', 'integer'), # How long did the edit last.
     Field('rules', 'text'),

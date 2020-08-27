@@ -13,10 +13,6 @@ DGOOD = 0.2
 import json
 import os
 APP_FOLDER = os.path.dirname(__file__)
-ZIP_FILE = os.path.join(APP_FOLDER, "data", "us-zip-code-latitude-and-longitude.json")
+ZIP_FILE = os.path.join(APP_FOLDER, "data", "zips.json")
 with open(ZIP_FILE, "r") as f:
-    zip_list = json.load(f)
-ZIPCODE_LOCATIONS = {}
-for el in zip_list:
-    r = el["fields"]
-    ZIPCODE_LOCATIONS[r["zip"]] = (r["latitude"], r["longitude"])
+    ZIPCODE_LOCATIONS = json.load(f)

@@ -1,3 +1,4 @@
-# vue_start
+# Vote Map
 
-A starting point for vue implementation work.
+# Deployment
+

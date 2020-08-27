@@ -10,9 +10,16 @@ from py4web.utils.factories import ActionFactory
 from py4web.utils.url_signer import URLSigner
 from . import settings
 
-db = DAL(settings.DB_URI,
-         folder=settings.DB_FOLDER,
-         pool_size=settings.DB_POOL_SIZE)
+if os.environ.get("GAE_ENV"):
+    # We are on appengine.
+    db = DAL(settings.GAE_DB_URI,
+             migrate_enabled=False, # No DB migrations in production.
+             pool_size=settings.DB_POOL_SIZE)
+else:
+    # We are on localhost.
+    db = DAL(settings.TESTING_DB_URI,
+             folder=settings.DB_FOLDER,
+             pool_size=settings.DB_POOL_SIZE)
 
 # define global objects that may or may not be used by th actions
 cache = Cache(size=1000)
@@ -57,11 +64,6 @@ if settings.OAUTH2GOOGLE_CLIENT_ID:
     auth.register_plugin(OAuth2Google(client_id=settings.OAUTH2GOOGLE_CLIENT_ID,
                                       client_secret=settings.OAUTH2GOOGLE_CLIENT_SECRET,
                                       callback_url='auth/plugin/oauth2google/callback'))
-if settings.OAUTH2FACEBOOK_CLIENT_ID:
-    from py4web.utils.auth_plugins.oauth2facebook import OAuth2Facebook # UNTESTED
-    auth.register_plugin(OAuth2Facebook(client_id=settings.OAUTH2FACEBOOK_CLIENT_ID,
-                                        client_secret=settings.OAUTH2FACEBOOK_CLIENT_SECRET,
-                                        callback_url='auth/plugin/oauth2google/callback'))
 
 auth.enable()
 
