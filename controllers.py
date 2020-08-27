@@ -325,3 +325,18 @@ def perform_update(id, d, max_zoom=None, edit_time=None):
 #     for z, (lat, lng) in ZIPCODE_LOCATIONS.items():
 #         db.zipcode.insert(zipcode=z, lat=lat, lng=lng)
 #     return "ok"
+
+@action('grantinitial')
+@action.uses(db)
+def grantinitial():
+    r = db(db.userinfo.email == "luca.de.alfaro@gmail.com").select().first()
+    if r is None:
+        db.userinfo.insert(
+            email="luca.de.alfaro@gmail.com",
+            can_edit=True,
+            can_invite=True,
+            invited_by=None,
+            invitation_code=str(uuid.uuid1()),
+        )
+        return "ok"
+    return "exists"
