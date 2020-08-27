@@ -78,6 +78,12 @@ def info():
 def info():
     return dict()
 
+
+@action('_ah/warmup')
+def warmup():
+    return "ok"
+
+
 ### API
 
 
@@ -88,9 +94,9 @@ def get_locations():
     zipcode = request.params.get('zipcode')
     if zipcode is not None:
         # Tries via zipcode.
-        r = ZIPCODE_LOCATIONS.get(zipcode)
+        r = db(db.zipcode.zipcode == zipcode).select().first()
         if r is not None:
-            lat, lng = r
+            lat, lng = r.lat, r.lng
             loc_specified = True
     if not loc_specified:
         appengine_loc = request.get_header("X-Appengine-CityLatLong")
@@ -215,3 +221,16 @@ def perform_update(id, d, max_zoom=None, edit_time=None):
 #     db(db.vote).delete()
 #
 
+# @action('storezips')
+# @action.uses(db)
+# def storezips():
+#     # Reads zip code database.
+#     import json
+#     import os
+#     APP_FOLDER = os.path.dirname(__file__)
+#     ZIP_FILE = os.path.join(APP_FOLDER, "data", "zips.json")
+#     with open(ZIP_FILE, "r") as f:
+#         ZIPCODE_LOCATIONS = json.load(f)
+#     for z, (lat, lng) in ZIPCODE_LOCATIONS.items():
+#         db.zipcode.insert(zipcode=z, lat=lat, lng=lng)
+#     return "ok"

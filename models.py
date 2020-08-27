@@ -83,4 +83,12 @@ db.define_table(
 )
 
 
+db.define_table(
+    'zipcode',
+    Field('zipcode'),
+    Field('lat', 'double'),
+    Field('lng', 'double'),
+)
+
+
 db.commit()

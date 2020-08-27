@@ -80,3 +80,11 @@ CREATE TABLE `vote` (
     CONSTRAINT `location_history_id_fk` FOREIGN KEY (`location_history_id`) REFERENCES `location_history` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+CREATE TABLE `zipcode` (
+    `id` int(11) AUTO_INCREMENT NOT NULL,
+    `zipcode` varchar(16),
+    `lat` double,
+    `lng` double,
+    PRIMARY KEY (`id`),
+    KEY `zipcode__idx` (`zipcode`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
