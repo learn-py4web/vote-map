@@ -53,6 +53,7 @@
             <div class="field">
               <label for="name" class="label">Name</label>
               <input class="input" placeholder="Location name" v-model="eloc.name">
+              <p v-if="!eloc.name" class="has-text-danger">The name cannot be empty</p>
             </div>
             <div class="field">
               <label class="label">Address</label>
@@ -90,7 +91,7 @@
             </div>
             <div class="field is-grouped">
               <p class="control"><button class="button is-danger" :disabled="edit_pending" @click="cancel_edit"><span class="icon is-small"><i class="fa fa-chevron-left"></i></span><span>Cancel</span></button></p>
-              <p class="control" v-if="is_modified || edit_pending"><button class="button is-info" :class="{'is-loading': edit_pending}" @click="save_edit"><span class="icon is-small"><i class="fa fa-check"></i></span><span>Save</span></button></p>
+              <p class="control" v-if="is_modified || edit_pending"><button class="button is-info" :disabled="!eloc.name" :class="{'is-loading': edit_pending}" @click="save_edit"><span class="icon is-small"><i class="fa fa-check"></i></span><span>Save</span></button></p>
               <p class="control" v-else><button class="button is-success" @click="confirm"><span class="icon is-small"><i class="fa fa-thumbs-up"></i></span><span>Correct</span></button></p>
             </div>
           </div>
