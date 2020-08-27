@@ -26,21 +26,21 @@ Warning: Fixtures MUST be declared with @action.uses({fixtures}) else your app w
 """
 
 import uuid
+import requests
 
-from py4web import action, request, abort, redirect, URL, Field
+from py4web import action, request, abort, redirect, URL, Field, HTTP
 from py4web.utils.form import Form, FormStyleBulma
 from py4web.utils.url_signer import URLSigner
 
 from yatl.helpers import A
 from . common import db, session, T, cache, auth, signed_url
 from . models import LOCATION_FIELDS, get_user_email
-from . settings_private import MAPS_API_KEY
+from . settings_private import MAPS_API_KEY, GEOLOCATION_KEY
 from .test_data import TEST_LOCATIONS
 from .constants import *
 from .util import cleanup, latlng_to_square10, get_results_in_region, get_concentric_results
 
 url_signer = URLSigner(session)
-
 
 ### PAGES
 
@@ -62,6 +62,7 @@ def edit():
     return dict(
         # This is an example of a signed URL for the callback.
         # See the index.html template for how this is passed to the javascript.
+        geolocation_url = URL('geolocation', signer=url_signer),
         callback_url = URL('edit_callback', signer=url_signer),
         MAPS_API_KEY = MAPS_API_KEY
     )
@@ -85,6 +86,21 @@ def warmup():
 
 
 ### API
+
+
+@action('geolocation')
+@action.uses(db, session, auth.user, url_signer.verify())
+def geolocation():
+    address = request.params.get('address')
+    if address is None:
+        return {}
+    r = requests.get(GEOLOCATION_URL, params={
+        "key": GEOLOCATION_KEY,
+        "address": address})
+    if r.status_code == 200:
+        return r.json()
+    else:
+        raise HTTP(500)
 
 
 @action('get_locations')
@@ -144,7 +160,7 @@ def edit_callback():
 
 
 @action('edit_callback', method='POST')
-@action.uses(db, session, url_signer.verify())
+@action.uses(db, session, auth.user, url_signer.verify())
 def post_edit():
     """Stores an edit, returning the ID if any."""
     if request.json.get('is_vote'):
