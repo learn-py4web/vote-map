@@ -164,7 +164,6 @@ def edit_callback():
 @action.uses(db, session, auth.user, url_signer.verify())
 def post_edit():
     """Stores an edit, returning the ID if any."""
-    time.sleep(2) # debug
     if request.json.get('is_vote'):
         # This is a vote.
         id = request.json.get('id')
