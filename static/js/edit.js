@@ -28,6 +28,7 @@ let init_vue = (app) => {
         // Fields.
         eloc: {},
         maybe_incomplete: false, // Zoom in to see all data.
+        edit_pending: false, // For button.
     };
 
     app.computed = {
@@ -136,15 +137,15 @@ let init_vue = (app) => {
         app.vue.mode = "browse";
         app.remove_markers();
         app.load_locations();
+        app.edit_pending = false;
     };
 
     app.save_edit = function () {
+        app.vue.edit_pending = true;
         let loc = app.vue.locations[app.edited_idx];
         for (const p of app.fields) {
             Vue.set(loc, p, app.vue.eloc[p]);
         }
-        app.edited_idx = null;
-        app.vue.mode = "browse";
         // Sends the edit.
         let send_loc = {}
         for (const p of app.fields) {
@@ -156,11 +157,15 @@ let init_vue = (app) => {
             loc: send_loc,
             dt: new Date() - app.ts,
             mz: app.mz}
-        );
-        // Resets the markers.
-        app.remove_markers();
-        // Reloads the locations, as one might have moved the map.
-        app.load_locations();
+        ).then(function () {
+            app.vue.edit_pending = false;
+            app.edited_idx = null;
+            app.vue.mode = "browse";
+            // Resets the markers.
+            app.remove_markers();
+            // Reloads the locations, as one might have moved the map.
+            app.load_locations();
+        });
     };
 
     app.confirm = function () {
@@ -168,6 +173,7 @@ let init_vue = (app) => {
             {is_vote: true, id: app.vue.eloc.id, mz: app.mz});
         app.edited_idx = null;
         app.vue.mode = "browse";
+        app.vue.edit_pending = false;
         app.remove_markers();
         app.load_locations();
     }

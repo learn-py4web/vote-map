@@ -25,8 +25,9 @@ session, db, T, auth, and tempates are examples of Fixtures.
 Warning: Fixtures MUST be declared with @action.uses({fixtures}) else your app will result in undefined behavior
 """
 
-import uuid
 import requests
+import uuid
+import time
 
 from py4web import action, request, abort, redirect, URL, Field, HTTP
 from py4web.utils.form import Form, FormStyleBulma
@@ -163,6 +164,7 @@ def edit_callback():
 @action.uses(db, session, auth.user, url_signer.verify())
 def post_edit():
     """Stores an edit, returning the ID if any."""
+    time.sleep(2) # debug
     if request.json.get('is_vote'):
         # This is a vote.
         id = request.json.get('id')
