@@ -220,7 +220,7 @@ def edit_callback():
     dead_results = []
     if request.params.get('include_deleted') == "true":
         dead_results, _ = get_results_in_region(
-            db, lat_max, lat_min, lng_max, lng_min, is_deleted=False,
+            db, lat_max, lat_min, lng_max, lng_min, is_deleted=True,
             max_results=MAX_MAP_RESULTS)
     # Remembers which results the user has requested.
     session['requested_ids'] = [x['id'] for x in live_results] + [x['id'] for x in dead_results]
