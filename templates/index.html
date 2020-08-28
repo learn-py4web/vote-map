@@ -20,6 +20,9 @@
             <input class="input" placeholder="Your zip code" @keydown="lookup_zip" v-model="zipcode">
             <span class="icon is-small is-right"><i class="fa fa-search"></i></span>
           </div>
+          <div v-if="!loc_specified && locations.length > 0">
+            Your location has been guessed on the basis of your IP address.
+          </div>
         </div>
 
         <!-- Place list -->
@@ -30,18 +33,15 @@
           Enter a zip code to search for locations where ballots can be returned.
         </div>
         <div v-else>
-          <div class="subtitle">Locations:</div>
-          <div v-if="!loc_specified && locations.length > 0">
-            Your location has been guessed on the basis of your IP address.
+          <div class="subtitle mt-4">Locations:</div>
+          <div v-if="locations.length > 0" class="has-text-grey">
+            Click on a result to display it on a map.
           </div>
-          <div class="location_list" style="overflow-y: scroll;">
+          <div class="location_list mt-4" style="overflow-y: auto; height: 500px;">
             <div v-for="loc in locations" class="location_result" @click="goto(loc._idx)">
               <p>{{loc.name}}</p>
               <p v-if="loc.address" class="is-size-6 has-text-grey">{{loc.address}}</p>
             </div>
-          </div>
-          <div v-if="locations.length > 0" class="has-text-grey mt-4">
-            Click on a result to display it on a map.
           </div>
         </div>
       </div>
@@ -56,19 +56,21 @@
             <label for="name" class="label">Name</label>
             <p>{{eloc.name}}</p>
           </div>
-          <div class="field">
+          <div v-if="eloc.county" class="field">
             <label for="county" class="label">County</label>
             <p>{{eloc.county}}</p>
           </div>
-          <div class="field">
+          <div v-if="eloc.address" class="field">
             <label class="label">Address</label>
             <p style="white-space: pre-wrap;">{{eloc.address}}</p>
           </div>
-          <div v-if="eloc.loc_type !== 'Other' || eloc.type_other" class="field">
-            <label class="label">Location type</label>
-            <p v-if="eloc.loc_type === 'Other'">{{eloc.type_other}}</p>
-            <p v-else>{{eloc.loc_type}}</p>
-          </div>
+          <template v-if="eloc.loc_type">
+            <div v-if="eloc.loc_type !== 'Other' || eloc.type_other" class="field">
+              <label class="label">Location type</label>
+              <p v-if="eloc.loc_type === 'Other'">{{eloc.type_other}}</p>
+              <p v-else>{{eloc.loc_type}}</p>
+            </div>
+          </template>
           <div v-if="eloc.rules" class="field">
             <label class="label">Rules</label>
             <p style="white-space: pre-wrap;">{{eloc.rules}}</p>
