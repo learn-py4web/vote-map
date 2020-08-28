@@ -83,12 +83,16 @@ def invite():
         invitation_code = r.invitation_code
     else:
         invitation_code = None
+    # Checks who the person has invited.
+    invited_list = db(db.userinfo.invited_by == get_user_email()).select(
+        db.userinfo.email).as_list()
     return dict(
         invalid = invalid,
         reason = reason,
         can_edit = r is not None and r.can_edit,
         can_invite = r is not None and r.can_invite,
         invitation_code = invitation_code,
+        invited_list = invited_list,
         validate_url = URL('validate_code'),
         refresh_url = URL('refresh_code', signer=url_signer),
     )

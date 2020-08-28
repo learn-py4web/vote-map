@@ -33,6 +33,19 @@
         <a class="button is-danger" href="[[=refresh_url]]">Regenerate invitation code</a>
       </div>
 
+      [[if len(invited_list) > 0:]]
+      <div class="subtitle mt-5">Users who have accepted your invitation</div>
+      <p>If you do not recognize some user, please regenerate your code and
+      notify us at <a href="mailto:vote-map@googlegroups.com">vote-map@googlegroups.com</a>.</p>
+      <table class="table mt-4 is-bordered is-striped">
+        <tbody>
+          [[for p in invited_list:]]
+            <tr><td>[[=p["email"] ]]</td></tr>
+          [[pass]]
+        </tbody>
+      </table>
+
+      [[pass]]
     [[else:]]
       <p>You cannot invite others to edit the site.
       Please contact the site managers if you think that this is a mistake.</p>
