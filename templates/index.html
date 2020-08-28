@@ -34,7 +34,7 @@
           <div v-if="!loc_specified && locations.length > 0">
             Your location has been guessed on the basis of your IP address.
           </div>
-          <div class="location_list">
+          <div class="location_list" style="overflow-y: scroll;">
             <div v-for="loc in locations" class="location_result" @click="goto(loc._idx)">
               <p>{{loc.name}}</p>
               <p v-if="loc.address" class="is-size-6 has-text-grey">{{loc.address}}</p>
