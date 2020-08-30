@@ -38,9 +38,12 @@
       <p>If you do not recognize some user, please regenerate your code and
       notify us at <a href="mailto:vote-map@googlegroups.com">vote-map@googlegroups.com</a>.</p>
       <table class="table mt-4 is-bordered is-striped">
+        <thead>
+          <tr><th>Name</th><th>Email</th></tr>
+        </thead>
         <tbody>
           [[for p in invited_list:]]
-            <tr><td>[[=p["email"] ]]</td></tr>
+            <tr><td>[[=p["first_name"] + " " + p["last_name"] ]]</td><td>[[=p["email"] ]]</td></tr>
           [[pass]]
         </tbody>
       </table>

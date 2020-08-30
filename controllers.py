@@ -84,8 +84,10 @@ def invite():
     else:
         invitation_code = None
     # Checks who the person has invited.
-    invited_list = db(db.userinfo.invited_by == get_user_email()).select(
-        db.userinfo.email).as_list()
+    invited_list = db(
+        (db.userinfo.invited_by == get_user_email()) &
+        (db.userinfo.email == db.auth_user.email)).select(
+        db.auth_user.email, db.auth_user.first_name, db.auth_user.last_name).as_list()
     return dict(
         invalid = invalid,
         reason = reason,
